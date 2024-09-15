@@ -1,0 +1,55 @@
+{% set title = "Вход | КМС квиз Плюшевой наковальни" %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/login.css?v={{version}}">
+</head>
+<body>
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <div class="logo">
+            <img src="/images/logo.svg">
+        </div>
+
+        <div class="logo-text">КМС ПРИЛОЖЕНИЕ</div>
+
+        <div class="login-header">Войдите в свой аккаунт</div>
+
+        <div class="login-form">
+            <div class="icon-input">
+                <div class="icon-input-icon" id="username-icon">
+                    <svg width="1.3em" height="1.3em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12,1a11,11,0,0,0,0,22,1,1,0,0,0,0-2,9,9,0,1,1,9-9v2.857a1.857,1.857,0,0,1-3.714,0V7.714a1,1,0,1,0-2,0v.179A5.234,5.234,0,0,0,12,6.714a5.286,5.286,0,1,0,3.465,9.245A3.847,3.847,0,0,0,23,14.857V12A11.013,11.013,0,0,0,12,1Zm0,14.286A3.286,3.286,0,1,1,15.286,12,3.29,3.29,0,0,1,12,15.286Z"/>
+                    </svg>
+                </div>
+                <div class="icon-input-input">
+                    <input class="basic-input" type="text" placeholder="Имя пользователя" id="username" oninput="InputError('username')">
+                </div>
+            </div>
+
+            <div class="icon-input">
+                <div class="icon-input-icon" id="password-icon">
+                    <svg class="form-row-fill-icon" width="1.3em" height="1.3em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 1C8.96243 1 6.5 3.46243 6.5 6.5C6.5 9.53757 8.96243 12 12 12C15.0376 12 17.5 9.53757 17.5 6.5C17.5 3.46243 15.0376 1 12 1ZM8.5 6.5C8.5 4.567 10.067 3 12 3C13.933 3 15.5 4.567 15.5 6.5C15.5 8.433 13.933 10 12 10C10.067 10 8.5 8.433 8.5 6.5Z" />
+                        <path d="M8 14C4.68629 14 2 16.6863 2 20V22C2 22.5523 2.44772 23 3 23C3.55228 23 4 22.5523 4 22V20C4 17.7909 5.79086 16 8 16H16C18.2091 16 20 17.7909 20 20V22C20 22.5523 20.4477 23 21 23C21.5523 23 22 22.5523 22 22V20C22 16.6863 19.3137 14 16 14H8Z" />
+                    </svg>
+                </div>
+                <div class="icon-input-input">
+                    <input class="basic-input" type="password" placeholder="Пароль" id="password" oninput="InputError('password')">
+                </div>
+            </div>
+
+            <div class="login-button">
+                <button class="basic-button gradient-button" onclick="SignIn()">Войти</button>
+            </div>
+
+            <div class="error" id="error"></div>
+        </div>
+    </div>
+
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+    <script src="/js/utils/inputs.js?v={{version}}"></script>
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/login.js?v={{version}}"></script>
+    {% include "components/footer.html" %}
+</body>
+</html>

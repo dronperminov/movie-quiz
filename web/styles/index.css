@@ -1,0 +1,272 @@
+.logo {
+    text-align: center;
+}
+
+.logo img {
+    width: 150px;
+    vertical-align: middle
+}
+
+.logo-text {
+    font-family: Montserrat;
+    font-size: 1.3em;
+    font-weight: bold;
+    text-align: center;
+
+    margin-bottom: 0.3em;
+}
+
+.slogan {
+    font-size: 1em;
+    text-align: center;
+    margin-bottom: 1.5em;
+}
+
+.mode {
+    padding: 1em;
+    border-radius: 1em;
+    border: 1px solid var(--main-color);
+    margin-bottom: 1.5em;
+}
+
+.mode-title {
+    font-family: Montserrat;
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-bottom: 0.5em;
+    text-align: center;
+}
+
+.mode-description {
+    color: var(--subtext-color);
+    margin-bottom: 1em;
+}
+
+.leaderboard {
+    margin-top: 1em;
+    margin-bottom: 2em;
+}
+
+.top-players {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 1em;
+    background: var(--block-background);
+    padding: 1em 0.5em 0.5em 0.5em;
+    border-radius: 0 0 1em 1em;
+}
+
+.top-player {
+    display: grid;
+    grid-template-columns: 1em 3em 1fr 4.8em;
+    grid-gap: 0.8em;
+    align-items: center;
+}
+
+.top-player-place {
+    font-weight: bold;
+    text-align: center;
+    font-family: Montserrat;
+}
+
+.top-player-image img {
+    width: 100%;
+    border-radius: 100%;
+    vertical-align: middle;
+}
+
+.top-player-rating {
+    font-size: 0.9em;
+    font-weight: bold;
+    font-family: Montserrat;
+    padding: 0.5em 0.8em;
+    background: var(--background-color);
+    color: var(--main-color);
+    box-shadow: 0px 7px 9px -8px var(--main-color);
+    border-radius: 0.9em;
+    text-align: right;
+    display: grid;
+    grid-template-columns: 1em 1fr;
+    align-items: center;
+}
+
+.top-player-rating img {
+    vertical-align: bottom;
+    margin-top: -0.1em;
+}
+
+.top-players-tags {
+    margin-top: 1em;
+    font-weight: bold;
+    font-size: 1.3em;
+}
+
+.top-player-tours-count {
+    font-size: 0.75em;
+    color: var(--subtext-color);
+    margin-top: 0.2em;
+}
+
+.top3-players {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 1.9em;
+    background: linear-gradient(45deg, #e9273f 0%, #c239a3 100%);
+    border-radius: 1em 1em 0 0;
+    padding: 1em 0.5em;
+    color: #fff;
+    margin-top: 1em;
+}
+
+.top3-players + .top-players {
+    padding-top: 4.5em;
+}
+
+.top3-player {
+    text-align: center;
+    position: relative;
+}
+
+.top3-player .top-player-image {
+    width: 70%;
+    margin: 0 auto 0.5em auto;
+    position: relative;
+    z-index: 1;
+    border-radius: 100%;
+    padding: 3px;
+    background: radial-gradient(#ffb73a, #fced76 95%);
+    box-shadow: 0px 10px 13px -8px #999;
+}
+
+.top3-player:first-child .top-player-image {
+    background: radial-gradient(#c7c7c7, #e6e6e6 95%);
+}
+
+.top3-player:last-child .top-player-image {
+    background: radial-gradient(#d77223, #f9aa69 95%);
+}
+
+.top3-player:first-child, .top3-player:last-child {
+    margin-top: 6em;
+}
+
+.top3-player .top-player-place {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: linear-gradient(107deg, #ff9800 0%, #e91e63 100%);
+    border-radius: 100%;
+    width: 2.2em;
+    height: 2.2em;
+    display: grid;
+    align-items: center;
+    font-size: 0.8em;
+}
+
+.top3-player .top-player-name {
+    font-size: 0.8em;
+    font-weight: bold;
+    width: min-content;
+    margin: 0 auto;
+}
+
+.top3-player .top-player-tours-count {
+    color: #f0f0f0;
+    margin-bottom: 0.7em;
+}
+
+.top3-player .top-player-rating {
+    display: inline-block;
+    font-size: 0.75em;
+}
+
+.top-player-flag {
+    background: linear-gradient(180deg, #fced76 0%, #ffb73a 100%);
+    width: 60%;
+    margin: -2em auto -4em auto;
+    padding-top: 2em;
+    padding-bottom: 2.5em;
+    clip-path: polygon(0% 0%, 0% 100%, 50% 80%, 100% 100%, 100% 0%);
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 0;
+}
+
+.top3-player:first-child .top-player-flag {
+    background: linear-gradient(180deg, #e6e6e6 0%, #c7c7c7 100%);
+}
+
+.top3-player:last-child .top-player-flag {
+    background: linear-gradient(180deg, #f9aa69 0%, #d77223 100%);
+}
+
+.faq {
+    padding: 0.7em;
+    border: 1px solid var(--border-color);
+    border-radius: 0.7em;
+    background: var(--block-background);
+    margin-bottom: 1.3em;
+}
+
+.faq:last-child {
+    margin-bottom: 0;
+}
+
+.faq-question {
+    display: grid;
+    grid-template-columns: 1fr 32px;
+    grid-gap: 10px;
+    min-height: 32px;
+}
+
+.faq-question label {
+    cursor: pointer;
+    font-size: 1.05em;
+}
+
+.faq-question img {
+    filter: grayscale(100%);
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.faq input {
+    display: none;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s;
+}
+
+.faq input:checked ~ .faq-question label {
+    font-weight: bold;
+}
+
+.faq input:checked ~ .faq-question img {
+    filter: unset;
+    transform: rotate(-135deg);
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.faq input:checked ~ .faq-answer {
+    font-size: 0.9em;
+    max-height: 100dvh;
+    overflow-y: auto;
+    transition: max-height 0.2s;
+}
+
+.faq-answer p {
+    margin-top: 0.8em;
+}
+
+@media (max-width: 767px) {
+    .top3-players {
+        grid-gap: 0.8em;
+    }
+
+    .top3-player .top-player-rating img {
+        width: 1.2em;
+    }
+}

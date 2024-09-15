@@ -1,0 +1,27 @@
+<header class="header">
+    <a href="/" class="logo">
+        <img src="/images/logo.svg?v=[{version}}">
+        <div>КМС<br>ПРИЛОЖЕНИЕ</div>
+    </a>
+
+    <input class="side-menu" type="checkbox" id="side-menu">
+    <label class="hamb" for="side-menu" onclick="CloseMenu()"><span class="hamb-line"></span></label>
+
+    <nav class="nav">
+        <ul class="menu">
+            <li><a href="/movies">ФИЛЬМЫ</a></li>
+            {% if user %}
+            <li class="subnav">
+                <input class="subnav-checkbox" type="checkbox" id="profile-subnav">
+                <p class="subnavbtn"><label class="menu-profile" for="profile-subnav"><img class="menu-profile-img" id="menu-profile-image" src="{{user.avatar_url}}" alt="аватар пользователя {{user.username}}" /><span class="menu-profile-text">ПРОФИЛЬ</label></span></p>
+                <div class="subnav-content">
+                    <a onclick="Logout()">ВЫЙТИ</a>
+                </div>
+            </li>
+            {% else %}
+            <li><a href="/login">ВХОД</a></li>
+            {% endif %}
+            <li><a href="https://plush-anvil.ru">САЙТ ПЛЮШЕВОЙ НАКОВАЛЬНИ</a></li>
+        </ul>
+    </nav>
+</header>

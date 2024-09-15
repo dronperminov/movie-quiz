@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru" translate="false" {% if user and user.role.value != "user" %}data-user-role="admin"{% endif %} {% if user %}data-user="user"{% endif %}>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=10">
+
+    <title>{{title}}</title>
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="512x512"  href="/images/favicons/android-chrome-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/images/favicons/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicons/favicon-16x16.png">
+    <meta name="msapplication-TileImage" content="/images/favicons/mstile-150x150.png">
+
+    <meta name="description" content="{{description}}">
+
+    <meta property="og:type" content="object" />
+    <meta property="og:title" content="{{title}}" />
+    <meta property="og:description" content="{{description}}" />
+    <meta property="og:url" content="https://music-quiz.plush-anvil.ru" />
+    <meta property="og:site_name" content="Музыкальный квиз Плюшевой наковальни" />
+
+    {% if banner %}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:image" content="{{banner}}" />
+    <meta property="og:image:secure_url" content="{{banner}}" />
+    <meta property="og:image:width" content="{{banner_width}}" />
+    <meta property="og:image:height" content="{{banner_height}}" />
+
+    <meta name="twitter:image:src" content="{{banner}}" />
+    <meta name="twitter:image:width" content="{{banner_width}}" />
+    <meta name="twitter:image:height" content="{{banner_height}}" />
+    {% endif %}
+
+    <meta name="twitter:title" content="{{title}}" />
+    <meta name="twitter:type" content="object" />
+    <meta name="twitter:desсription" content="{{description}}" />
+
+    <meta name="theme-color" content="#eeeeee">
+
+    <link rel="stylesheet" type="text/css" href="/styles/styles.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/inputs.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/menu.css?v={{version}}">

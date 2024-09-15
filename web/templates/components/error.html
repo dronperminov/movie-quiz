@@ -1,0 +1,15 @@
+{% set title = "%s | КМС квиз Плюшевой наковальни" % title %}
+{% include "components/header.html" %}
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <h1>{{error_title}}</h1>
+
+        <p>{{error_text}}</p>
+    </div>
+
+    {% include "components/footer.html" %}
+</body>
+</html>

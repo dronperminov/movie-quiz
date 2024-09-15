@@ -1,0 +1,44 @@
+<script>
+const TOKEN_NAME = "quiz_token"
+
+function Logout() {
+    localStorage.removeItem(TOKEN_NAME)
+    document.cookie = `${TOKEN_NAME}=; Max-Age=-99999999; SameSite=strict`
+    location.href="/logout"
+}
+
+function CloseMenu() {
+    for (let checkbox of document.getElementsByClassName("subnav-checkbox"))
+        checkbox.checked = false
+}
+
+function GetCookieToken() {
+    for (let cookie of document.cookie.split(';')) {
+        while (cookie.charAt(0) == ' ')
+            cookie = cookie.slice(1, cookie.length)
+
+        if (cookie.indexOf(`${TOKEN_NAME}=`) == 0)
+            return decodeURIComponent(cookie.slice(TOKEN_NAME.length + 1, cookie.length))
+    }
+
+    return null;
+}
+
+function UpdateCookieToken() {
+    let token = localStorage.getItem(TOKEN_NAME)
+    if (token === null)
+        return
+
+    document.cookie = `${TOKEN_NAME}=${token}; SameSite=strict`
+
+    {% if not user %}
+    SendRequest("/validate", {}).then(response => {
+        if (response.status == SUCCESS_STATUS && response.valid) {
+            location.reload()
+        }
+    })
+    {% endif %}
+}
+
+UpdateCookieToken()
+</script>

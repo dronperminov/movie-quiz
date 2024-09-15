@@ -1,0 +1,24 @@
+{% set title = "КМС квиз Плюшевой наковальни" %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/index.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <div class="logo">
+            <img src="/images/logo.svg">
+        </div>
+
+        <div class="logo-text">КМС ПРИЛОЖЕНИЕ</div>
+
+        <div class="slogan">Тренируйся угадывать КМС и улучшай свои музыкальные знания!</div>
+
+    </div>
+
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+
+    {% include "components/footer.html" %}
+</body>
+</html>

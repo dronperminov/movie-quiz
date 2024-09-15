@@ -1,0 +1,36 @@
+.logo {
+    text-align: center;
+}
+
+.logo img {
+    width: 150px;
+    vertical-align: middle
+}
+
+.logo-text {
+    font-family: Montserrat;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+
+    margin-bottom: 2em;
+}
+
+.login-header {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.login-form {
+    font-size: 1.1em;
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 0.5em;
+}
+
+.login-button button {
+    width: 100%;
+    padding-top: 0.7em;
+    padding-bottom: 0.7em;
+}
