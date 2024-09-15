@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
+from src.entities.actor import Actor
 from src.entities.metadata import Metadata
 from src.entities.rating import Rating
 from src.entities.source import Source
@@ -22,8 +23,8 @@ class Movie:
     production: List[Production]
     countries: List[str]
     genres: List[Genre]
-    actors: List[int]
-    directors: List[int]
+    actors: List[Actor]
+    directors: List[Actor]
     duration: float
     rating: Rating
     image_urls: List[str]
@@ -48,8 +49,8 @@ class Movie:
             "production": [production.value for production in self.production],
             "countries": self.countries,
             "genres": [genre.value for genre in self.genres],
-            "actors": self.actors,
-            "directors": self.directors,
+            "actors": [actor.to_dict() for actor in self.actors],
+            "directors": [director.to_dict() for director in self.directors],
             "duration": self.duration,
             "rating": self.rating.to_dict(),
             "image_urls": self.image_urls,
@@ -76,8 +77,8 @@ class Movie:
             production=[Production(production) for production in data["production"]],
             countries=data["countries"],
             genres=[Genre(genre) for genre in data["genres"]],
-            actors=data["actors"],
-            directors=data["directors"],
+            actors=[Actor.from_dict(actor) for actor in data["actors"]],
+            directors=[Actor.from_dict(director) for director in data["directors"]],
             duration=data["duration"],
             rating=Rating.from_dict(data["rating"]),
             image_urls=data["image_urls"],
@@ -89,3 +90,18 @@ class Movie:
             alternative_names=data["alternative_names"],
             metadata=Metadata.from_dict(data["metadata"])
         )
+
+    def get_diff(self, data: dict) -> dict:
+        movie_data = self.to_dict()
+        diff = {}
+
+        fields = [
+            "name", "movie_type", "year", "slogan", "description", "short_description", "production", "countries", "genres", "actors",
+            "directors", "duration", "rating", "image_urls", "poster_url", "banner_url", "facts", "cites", "tracks", "alternative_names"
+        ]
+
+        for field in fields:
+            if field in data and movie_data[field] != data[field]:
+                diff[field] = {"prev": movie_data[field], "new": data[field]}
+
+        return diff

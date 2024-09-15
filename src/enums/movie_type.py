@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class MovieType(Enum):
-    FILM = "film"
+    MOVIE = "movie"
     CARTOON = "cartoon"
     SERIES = "series"
     ANIMATED_SERIES = "animated-series"
@@ -10,7 +10,7 @@ class MovieType(Enum):
 
     def to_rus(self) -> str:
         movie_type2rus = {
-            MovieType.FILM: "фильм",
+            MovieType.MOVIE: "фильм",
             MovieType.CARTOON: "мультфильм",
             MovieType.SERIES: "сериал",
             MovieType.ANIMATED_SERIES: "анимационный сериал",
@@ -18,3 +18,15 @@ class MovieType(Enum):
         }
 
         return movie_type2rus[self]
+
+    @classmethod
+    def from_kinopoisk(cls: "MovieType", movie_type: str) -> "MovieType":
+        kinopoisk2movie_type = {
+            "movie": MovieType.MOVIE,
+            "tv-series": MovieType.SERIES,
+            "cartoon": MovieType.CARTOON,
+            "animated-series": MovieType.ANIMATED_SERIES,
+            "anime": MovieType.ANIME
+        }
+
+        return kinopoisk2movie_type[movie_type]

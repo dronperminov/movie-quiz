@@ -24,7 +24,7 @@ class Source:
 
 @dataclass
 class KinopoiskSource(Source):
-    kinopoisk_id: str
+    kinopoisk_id: int
     name = "kinopoisk"
 
     def to_dict(self) -> dict:

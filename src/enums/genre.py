@@ -72,3 +72,42 @@ class Genre(Enum):
         }
 
         return genre2rus[self]
+
+    @classmethod
+    def from_kinopoisk(cls: "Genre", genre: str) -> "Genre":
+        kinopoisk2genre = {
+            "аниме": Genre.ANIME,
+            "биография": Genre.BIOGRAPHY,
+            "боевик": Genre.ACTION,
+            "вестерн": Genre.WESTERN,
+            "военный": Genre.WAR,
+            "детектив": Genre.DETECTIVE,
+            "детский": Genre.CHILDREN,
+            "для взрослых": Genre.ADULT,
+            "документальный": Genre.DOCUMENTARY,
+            "драма": Genre.DRAMA,
+            "игра": Genre.GAME,
+            "история": Genre.HISTORY,
+            "комедия": Genre.COMEDY,
+            "концерт": Genre.CONCERT,
+            "короткометражка": Genre.SHORT_FILM,
+            "криминал": Genre.CRIME,
+            "мелодрама": Genre.MELODRAMA,
+            "музыка": Genre.MUSIC,
+            "мультфильм": Genre.CARTOON,
+            "мюзикл": Genre.MUSICAL,
+            "новости": Genre.NEWS,
+            "приключения": Genre.ADVENTURE,
+            "реальное ТВ": Genre.REALITY_TV,
+            "семейный": Genre.FAMILY,
+            "спорт": Genre.SPORTS,
+            "ток-шоу": Genre.TALK_SHOW,
+            "триллер": Genre.THRILLER,
+            "ужасы": Genre.HORROR,
+            "фантастика": Genre.SCI_FI,
+            "фильм-нуар": Genre.NOIR,
+            "фэнтези": Genre.FANTASY,
+            "церемония": Genre.CEREMONY,
+        }
+
+        return kinopoisk2genre[genre]

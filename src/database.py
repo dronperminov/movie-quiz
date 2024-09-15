@@ -15,6 +15,7 @@ class Database:
     settings = None
     movies = None
     tracks = None
+    persons = None
     cites = None
     history = None
 
@@ -28,7 +29,7 @@ class Database:
 
         self.identifiers = database["identifiers"]
 
-        for name in ["movies", "cites", "tracks"]:
+        for name in ["movies", "cites", "tracks", "persons"]:
             if self.identifiers.find_one({"_id": name}) is None:
                 self.identifiers.insert_one({"_id": name, "value": 0})
 
@@ -42,6 +43,9 @@ class Database:
         self.movies = database["movies"]
         self.movies.create_index([("movie_id", ASCENDING)], unique=True)
         self.movies.create_index([("name", ASCENDING)])
+
+        self.persons = database["persons"]
+        self.persons.create_index([("person_id", ASCENDING)], unique=True)
 
         self.tracks = database["tracks"]
         self.tracks.create_index([("track_id", ASCENDING)], unique=True)

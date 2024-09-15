@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class Production(Enum):
@@ -16,3 +17,14 @@ class Production(Enum):
         }
 
         return production2rus[self]
+
+    @classmethod
+    def from_countries(cls: "Production", countries: List[str]) -> "List[Production]":
+        country2production = {
+            "Россия": Production.RUSSIAN,
+            "СССР": Production.RUSSIAN,
+            "Корея Южная": Production.KOREAN,
+            "Турция": Production.TURKISH
+        }
+
+        return list({country2production.get(country, Production.FOREIGN) for country in countries})

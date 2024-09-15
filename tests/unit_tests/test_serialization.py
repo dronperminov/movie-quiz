@@ -1,12 +1,14 @@
 from datetime import datetime
 from unittest import TestCase
 
+from src.entities.actor import Actor
 from src.entities.cite import Cite
-from src.entities.history_action import AddMovieAction, EditMovieAction, HistoryAction, RemoveMovieAction
+from src.entities.history_action import AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction, HistoryAction, RemoveMovieAction, RemovePersonAction
 from src.entities.lyrics import Lyrics
 from src.entities.lyrics_line import LyricsLine
 from src.entities.metadata import Metadata
 from src.entities.movie import Movie
+from src.entities.person import Person
 from src.entities.rating import Rating
 from src.entities.source import HandSource, KinopoiskSource, Source, YandexSource
 from src.entities.spoiler_text import SpoilerText
@@ -17,7 +19,7 @@ from src.enums.production import Production
 
 class TestSerialization(TestCase):
     def test_source_serialization(self) -> None:
-        sources = [KinopoiskSource(kinopoisk_id="123"), YandexSource(yandex_id="14"), HandSource()]
+        sources = [KinopoiskSource(kinopoisk_id=123), YandexSource(yandex_id="14"), HandSource()]
 
         for source in sources:
             source_dict = source.to_dict()
@@ -93,12 +95,35 @@ class TestSerialization(TestCase):
         track_from_dict = Track.from_dict(track_dict)
         self.assertEqual(track, track_from_dict)
 
+    def test_person_serialization(self) -> None:
+        person = Person(
+            person_id=1,
+            kinopoisk_id=456,
+            name="Person Name",
+            photo_url="photo url",
+            metadata=Metadata.initial(username="user")
+        )
+
+        person_dict = person.to_dict()
+        person_from_dict = Person.from_dict(person_dict)
+        self.assertEqual(person, person_from_dict)
+
+    def test_actor_serialization(self) -> None:
+        actor = Actor(
+            person_id=1,
+            description="some description"
+        )
+
+        actor_dict = actor.to_dict()
+        actor_from_dict = Actor.from_dict(actor_dict)
+        self.assertEqual(actor, actor_from_dict)
+
     def test_movie_serialization(self) -> None:
         movie = Movie(
             movie_id=1,
             name="Movie name",
-            source=KinopoiskSource(kinopoisk_id="45"),
-            movie_type=MovieType.FILM,
+            source=KinopoiskSource(kinopoisk_id=45),
+            movie_type=MovieType.MOVIE,
             year=2024,
             slogan="Some slogan text",
             description=SpoilerText(text="Some long description", spoilers=[(5, 9)]),
@@ -106,8 +131,8 @@ class TestSerialization(TestCase):
             production=[Production.RUSSIAN, Production.FOREIGN],
             countries=["Russia", "USA"],
             genres=[Genre.BIOGRAPHY, Genre.HISTORY],
-            actors=[4, 6, 8],
-            directors=[1, 4],
+            actors=[Actor(person_id=1, description="description 1"), Actor(person_id=2, description="description 2")],
+            directors=[Actor(person_id=5, description="description 3")],
             duration=148.5,
             rating=Rating(rating_kp=1.9, rating_imdb=0.2, votes_kp=678),
             image_urls=["url1", "url2"],
@@ -129,6 +154,9 @@ class TestSerialization(TestCase):
             AddMovieAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), movie_id=1),
             EditMovieAction(username="user2", timestamp=datetime(2024, 1, 1, 20, 42, 12), movie_id=1, diff={"name": "aba"}),
             RemoveMovieAction(username="user3", timestamp=datetime(2024, 1, 2, 12, 00, 19), movie_id=1),
+            AddPersonAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), person_id=1),
+            EditPersonAction(username="user2", timestamp=datetime(2024, 1, 1, 20, 42, 12), person_id=1, diff={"name": "aba"}),
+            RemovePersonAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), person_id=1),
         ]
 
         for history_action in history_actions:

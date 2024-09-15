@@ -33,6 +33,15 @@ class HistoryAction:
         if name == RemoveMovieAction.name:
             return RemoveMovieAction(username=username, timestamp=timestamp, movie_id=data["movie_id"])
 
+        if name == AddPersonAction.name:
+            return AddPersonAction(username=username, timestamp=timestamp, person_id=data["person_id"])
+
+        if name == EditPersonAction.name:
+            return EditPersonAction(username=username, timestamp=timestamp, person_id=data["person_id"], diff=data["diff"])
+
+        if name == RemovePersonAction.name:
+            return RemovePersonAction(username=username, timestamp=timestamp, person_id=data["person_id"])
+
         raise ValueError(f'Invalid HistoryAction name "{name}"')
 
 
@@ -62,3 +71,31 @@ class RemoveMovieAction(HistoryAction):
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), "movie_id": self.movie_id}
+
+
+@dataclass
+class AddPersonAction(HistoryAction):
+    name = "add_person"
+    person_id: int
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "person_id": self.person_id}
+
+
+@dataclass
+class EditPersonAction(HistoryAction):
+    name = "edit_person"
+    person_id: int
+    diff: dict
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "person_id": self.person_id, "diff": self.diff}
+
+
+@dataclass
+class RemovePersonAction(HistoryAction):
+    name = "remove_person"
+    person_id: int
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "person_id": self.person_id}

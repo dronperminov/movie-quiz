@@ -4,6 +4,7 @@ import os
 import sys
 
 from src.database import Database
+from src.movie_database import MovieDatabase
 from src.utils.kinopoisk_parser import KinopoiskParser
 
 
@@ -20,3 +21,4 @@ else:
     kinopoisk_parser = None
 
 database = Database(mongo_url="mongodb://localhost:27017/", database_name="movie_quiz_db")
+movie_database = MovieDatabase(database=database, kinopoisk_parser=kinopoisk_parser, logger=logger)
