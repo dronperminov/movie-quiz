@@ -3,6 +3,7 @@ import logging
 import os
 import sys
 
+from src.database import Database
 from src.utils.kinopoisk_parser import KinopoiskParser
 
 
@@ -17,3 +18,5 @@ if os.path.exists(secrets_path):
     kinopoisk_parser = KinopoiskParser(tokens=secrets["kinopoisk_tokens"], logger=logger)
 else:
     kinopoisk_parser = None
+
+database = Database(mongo_url="mongodb://localhost:27017/", database_name="movie_quiz_db")
