@@ -51,6 +51,83 @@ Movie.prototype.Build = function() {
     return movie
 }
 
+Movie.prototype.BuildPage = function(blockId = "movie") {
+    let movie = document.getElementById(blockId)
+
+    let movieImage = MakeElement("movie-image", movie)
+    if (this.bannerUrl !== null)
+        MakeElement("", movieImage, {src: this.bannerUrl, loading: "lazy"}, "img")
+    this.BuildRating(movieImage)
+
+    this.BuildName(movie, "movie-name")
+
+    MakeElement("movie-main-info", movie, {innerText: this.GetMainInfo()})
+    MakeElement("movie-sub-info", movie, {innerText: this.GetSubInfo()})
+
+    if (this.shortDescription.text.length > 0)
+        MakeElement("movie-short-description", movie, {innerText: this.shortDescription.text})
+
+    if (this.description.text.length > 0) {
+        let description = MakeElement("movie-description", movie, {innerText: this.description.text})
+        let link = MakeElement("movie-description-link", movie, {innerText: "Полное описание"})
+        link.addEventListener("click", () => {
+            description.classList.toggle("movie-description-open")
+            link.innerText = description.classList.contains("movie-description-open") ? "Свернуть" : "Полное описание"
+        })
+    }
+
+    if (this.slogan.length > 0)
+        MakeElement("movie-slogan", movie, {innerHTML: `<b>Слоган</b>: ${this.slogan}`})
+
+    this.BuildPageImages(movie)
+    this.BuildPagePersons(movie, "Актёры", this.actors)
+    this.BuildPagePersons(movie, "Режиссёр" + (this.directors.length > 1 ? "ы" : ""), this.directors)
+    this.BuildPageFacts(movie)
+}
+
+Movie.prototype.BuildPageImages = function(parent) {
+    if (this.imageUrls.length == 0)
+        return
+
+    MakeElement("movie-header", parent, {innerText: "Кадры"})
+
+    let images = MakeElement("movie-images", parent)
+    let container = MakeElement("movie-images-container", images)
+
+    for (let imageUrl of this.imageUrls)
+        MakeElement("", container, {src: imageUrl, loading: "lazy"}, "img")
+}
+
+Movie.prototype.BuildPagePersons = function(parent, header, persons) {
+    if (persons.length == 0)
+        return
+
+    MakeElement("movie-header", parent, {innerText: header})
+
+    let images = MakeElement("movie-images", parent)
+    let container = MakeElement("movie-images-container", images)
+
+    for (let actor of persons) {
+        let actorBlock = MakeElement("movie-actor", container)
+        let person = this.params.personId2person[`${actor.person_id}`]
+
+        MakeElement("", actorBlock, {src: person.photo_url, loading: "lazy"}, "img")
+        MakeElement("", actorBlock, {innerText: person.name})
+    }
+}
+
+Movie.prototype.BuildPageFacts = function(parent) {
+    if (this.facts.length == 0)
+        return
+
+    MakeElement("movie-header", parent, {innerText: "Факты"})
+
+    let facts = MakeElement("movie-facts", parent)
+
+    for (let fact of this.facts)
+        MakeElement("movie-fact", facts, {innerText: fact.text})
+}
+
 Movie.prototype.BuildInfo = function() {
     let info = MakeElement("info", null, {"id": `info-movie-${this.movieId}`})
     let closeIcon = MakeElement("close-icon", info, {title: "Закрыть"})
@@ -58,15 +135,7 @@ Movie.prototype.BuildInfo = function() {
     let infoImage = MakeElement("info-image", info)
     MakeElement("", infoImage, {src: this.bannerUrl, loading: "lazy"}, "img")
 
-    if (this.source.name == "kinopoisk") {
-        let header = MakeElement("info-header-line", info)
-        let link = MakeElement("", header, {href: `https://kinopoisk.ru/film/${this.source.kinopoisk_id}`, target: "_blank"}, "a")
-        let img = MakeElement("", link, {src: "/images/kinopoisk.svg"}, "img")
-        let span = MakeElement("", header, {innerText: ` ${this.name}`}, "span")
-    }
-    else {
-        MakeElement("info-header-line", info, {innerHTML: this.name})
-    }
+    this.BuildName(info, "info-header-line")
 
     let rating = MakeElement("info-line", info, {innerHTML: `<b>Рейтинг КП</b>: `})
     MakeElement("info-line", info, {innerHTML: `<b>Тип КМС</b>: ${this.movieType.ToRus()}`})
@@ -101,7 +170,22 @@ Movie.prototype.BuildInfo = function() {
     return info
 }
 
+Movie.prototype.BuildName = function(parent, className) {
+    if (this.source.name == "kinopoisk") {
+        let header = MakeElement(className, parent)
+        let link = MakeElement("", header, {href: `https://kinopoisk.ru/film/${this.source.kinopoisk_id}`, target: "_blank"}, "a")
+        let img = MakeElement("", link, {src: "/images/kinopoisk.svg"}, "img")
+        let span = MakeElement("", header, {innerText: ` ${this.name}`}, "span")
+    }
+    else {
+        MakeElement(className, parent, {innerHTML: this.name})
+    }
+}
+
 Movie.prototype.BuildInfoImages = function(parent) {
+    if (this.imageUrls.length == 0)
+        return
+
     let images = MakeElement("info-images", parent)
     MakeElement("info-line", images, {innerHTML: "<b>Кадры</b>"})
     let imagesDiv = MakeElement("info-images-container", images)
@@ -113,6 +197,9 @@ Movie.prototype.BuildInfoImages = function(parent) {
 }
 
 Movie.prototype.BuildInfoActors = function(parent) {
+    if (this.actors.length == 0)
+        return
+
     let actors = MakeElement("info-images", parent)
     MakeElement("info-line", actors, {innerHTML: "<b>Актёры</b>"})
     let actorsDiv = MakeElement("info-images-container", actors)
@@ -134,13 +221,24 @@ Movie.prototype.BuildRating = function(parent) {
 }
 
 Movie.prototype.GetShortInfo = function() {
-    let country = this.countries[0]
-    let genre = this.genres.genres[0].ToRus()
-    return [country, genre].join(" • ")
+    return [this.countries[0], this.genres.ToRus(1)].join(" • ")
 }
 
 Movie.prototype.GetStats = function() {
     return [this.year, this.FormatVotes(), this.movieType.ToRus()].join(" | ")
+}
+
+Movie.prototype.GetMainInfo = function() {
+    let info = [this.year, this.genres.ToRus(2)]
+
+    if (this.duration)
+        info.push(this.FormatDuration())
+
+    return info.join(" • ")
+}
+
+Movie.prototype.GetSubInfo = function() {
+    return [this.movieType.ToRus(), this.countries.slice(0, 2).join(", "), this.FormatVotes()].join(" • ")
 }
 
 Movie.prototype.FormatVotes = function() {

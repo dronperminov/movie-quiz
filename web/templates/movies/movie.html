@@ -1,0 +1,27 @@
+{% set title = "%s | КМС квиз Плюшевой наковальни" % movie.name %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/movies/movie.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <div id="movie"></div>
+    </div>
+
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+
+    <script src="/js/entities/movie_type.js?v={{version}}"></script>
+    <script src="/js/entities/genre.js?v={{version}}"></script>
+    <script src="/js/entities/production.js?v={{version}}"></script>
+    <script src="/js/entities/metadata.js?v={{version}}"></script>
+    <script src="/js/entities/movie.js?v={{version}}"></script>
+
+    <script>
+        let movie = new Movie({{jsonable_encoder(movie)|tojson}}, {personId2person: {{jsonable_encoder(person_id2person)|tojson}}})
+        movie.BuildPage()
+    </script>
+    {% include "components/footer.html" %}
+</body>
+</html>

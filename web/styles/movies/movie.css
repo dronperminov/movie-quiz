@@ -1,0 +1,140 @@
+.movie-image {
+    position: relative;
+    min-height: 25px;
+}
+
+.movie-image img {
+    border-radius: 0.7em;
+    width: 100%;
+}
+
+.movie-image .movie-rating {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.movie-image img ~ .movie-rating {
+    right: 0.4em;
+    bottom: 0.6em;
+    left: unset;
+    top: unset;
+}
+
+.movie-rating {
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-family: Montserrat;
+    font-size: 0.85em;
+    color: #fff;
+    display: inline-block;
+}
+
+.movie-name {
+    text-align: center;
+    font-size: 1.6em;
+    font-weight: bold;
+    margin-bottom: 0.4em;
+}
+
+.movie-name img {
+    vertical-align: baseline;
+}
+
+.movie-main-info {
+    text-align: center;
+    color: var(--subtext-color);
+    font-size: 0.95em;
+    margin-bottom: 0.5em;
+}
+
+.movie-sub-info {
+    text-align: center;
+    color: var(--subtext-color);
+    font-size: 0.85em;
+    margin-bottom: 1.4em;
+}
+
+.movie-short-description {
+    color: var(--text-color);
+    font-size: 0.95em;
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.movie-description {
+    color: var(--text-color);
+    font-size: 0.95em;
+    line-height: 1.3em;
+    word-wrap: break-word;
+    max-height: 2.6em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+    transition: max-height 0.1s ease-out;
+    margin-bottom: 0.2em;
+}
+
+.movie-description-open {
+    max-height: 1000px;
+    transition: max-height 0.1s ease-in;
+}
+
+.movie-description-link {
+    color: var(--main-color);
+    font-weight: bold;
+    cursor: pointer;
+    margin-bottom: 0.8em;
+}
+
+.movie-slogan {
+    margin-bottom: 1em;
+}
+
+.movie-header {
+    font-size: 1.05em;
+    font-weight: bold;
+    margin-top: 1em;
+    margin-bottom: 0.3em;
+}
+
+.movie-images {
+    max-width: 100%;
+    overflow-x: auto
+}
+
+.movie-images-container {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-gap: 5px;
+}
+
+.movie-images-container img {
+    padding: 2px;
+    height: 160px;
+    border-radius: 0.5em;
+    vertical-align: top;
+}
+
+.movie-images-container .movie-actor {
+    font-size: 0.7em;
+    text-align: center;
+    max-width: 105px;
+}
+
+.movie-facts {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 0.8em;
+    max-height: 220px;
+    overflow-y: auto
+}
+
+.movie-fact {
+    font-size: 0.95em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    background-color: var(--block-background);
+    border: 1px solid var(--border-color);
+}

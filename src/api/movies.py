@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from src import movie_database
-from src.api import templates
+from src.api import send_error, templates
 from src.entities.user import User
 from src.enums import MovieType
 from src.enums.production import Production
@@ -52,3 +52,24 @@ def search_movies(params: MovieSearch) -> JSONResponse:
         "movies": jsonable_encoder(movies),
         "person_id2person": jsonable_encoder(person_id2person)
     })
+
+
+@router.get("/movies/{movie_id}")
+def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLResponse:
+    movie = movie_database.get_movie(movie_id=movie_id)
+
+    if movie is None:
+        return send_error(title="Фильм не найден", text="Не удалось найти запрашиваемый фильм. Возможно, он был удалён", user=user)
+
+    person_id2person = movie_database.get_movies_persons(movies=[movie])
+
+    template = templates.get_template("movies/movie.html")
+    content = template.render(
+        user=user,
+        version=get_static_hash(),
+        movie=movie,
+        person_id2person=person_id2person,
+        jsonable_encoder=jsonable_encoder,
+        get_word_form=get_word_form
+    )
+    return HTMLResponse(content=content)

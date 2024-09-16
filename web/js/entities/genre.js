@@ -44,6 +44,9 @@ function GenreList(genres) {
     this.genres = genres.map(genre => new Genre(genre))
 }
 
-GenreList.prototype.ToRus = function() {
-    return this.genres.map(genre => genre.ToRus()).join(", ")
+GenreList.prototype.ToRus = function(maxCount = 0) {
+    if (maxCount == 0)
+        maxCount = this.genres.length
+
+    return this.genres.slice(0, maxCount).map(genre => genre.ToRus()).join(", ")
 }
