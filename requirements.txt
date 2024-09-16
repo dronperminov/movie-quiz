@@ -1,3 +1,4 @@
+beautifulsoup4
 fastapi
 Jinja2
 Levenshtein

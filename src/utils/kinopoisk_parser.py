@@ -4,6 +4,7 @@ import time
 from typing import Dict, List, Set
 
 import requests
+from bs4 import BeautifulSoup
 
 from src.enums import Genre, MovieType
 from src.enums.production import Production
@@ -20,10 +21,10 @@ class KinopoiskParser:
         ]
         self.image_types = ["screenshot", "shooting", "still"]
 
-    def parse_movies(self, movie_ids: List[int]) -> List[dict]:
+    def parse_movies(self, movie_ids: List[int], max_images: int = 50) -> List[dict]:
         movies = self.__get_movies(query_params=[f"id={movie_id}" for movie_id in movie_ids])
         movie_id2images = self.parse_movie_images(movie_ids=movie_ids)
-        return [self.__parse_movie(movie, movie_id2images[movie["id"]]) for movie in movies]
+        return [self.__parse_movie(movie, movie_id2images[movie["id"]][:max_images]) for movie in movies]
 
     def parse_movie_images(self, movie_ids: List[int]) -> Dict[int, List[dict]]:
         movie_id2images = {movie_id: [] for movie_id in movie_ids}
@@ -68,7 +69,7 @@ class KinopoiskParser:
             "image_urls": [image["url"] for image in images if image["width"] >= image["height"] * 1.3],
             "poster_url": movie["poster"]["previewUrl"],
             "banner_url": backdrop["previewUrl"],
-            "facts": [self.__get_spoilers(text=fact["value"], names=names) for fact in facts] if facts else [],
+            "facts": [self.__get_spoilers(text=BeautifulSoup(fact["value"], "html.parser").text, names=names) for fact in facts] if facts else [],
             "alternative_names": sorted(names)
         }
 

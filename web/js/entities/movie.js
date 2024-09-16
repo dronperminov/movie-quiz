@@ -7,7 +7,7 @@ function Movie(data, params) {
     this.slogan = data.slogan
     this.description = data.description
     this.shortDescription = data.short_description
-    this.production = data.production
+    this.production = new ProductionList(data.production)
     this.countries = data.countries
     this.genres = new GenreList(data.genres)
     this.actors = data.actors
@@ -82,6 +82,7 @@ Movie.prototype.BuildInfo = function() {
     if (this.shortDescription.text.length > 0)
         MakeElement("info-line", info, {innerHTML: `<b>Короткое описание</b>: ${this.shortDescription.text}`})
 
+    MakeElement("info-line", info, {innerHTML: `<b>Производство</b>: ${this.production.ToRus()}`})
     MakeElement("info-line", info, {innerHTML: `<b>Стран${this.countries.length == 1 ? "а" : "ы"}</b>: ${this.countries.join(", ")}`})
     MakeElement("info-line", info, {innerHTML: `<b>Жанр${this.genres.genres.length == 1 ? "" : "ы"}</b>: ${this.genres.ToRus()}`})
     MakeElement("info-line", info, {innerHTML: `<b>Режиссёр${this.directors.length == 1 ? "" : "ы"}</b>: ${this.GetDirectors()}`})

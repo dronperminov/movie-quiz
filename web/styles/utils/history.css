@@ -1,0 +1,17 @@
+.history {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 1.5em;
+    font-size: 0.8em;
+    padding: 0.5em 0;
+}
+
+.action {
+    max-width: 100%;
+    overflow: auto;
+    padding: 2px 0;
+}
+
+.action ul {
+    margin-left: 16px;
+}
