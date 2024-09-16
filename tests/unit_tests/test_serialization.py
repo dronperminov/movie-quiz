@@ -13,8 +13,7 @@ from src.entities.rating import Rating
 from src.entities.source import HandSource, KinopoiskSource, Source, YandexSource
 from src.entities.spoiler_text import SpoilerText
 from src.entities.track import Track
-from src.enums import Genre, MovieType
-from src.enums.production import Production
+from src.enums import Genre, MovieType, Production
 
 
 class TestSerialization(TestCase):

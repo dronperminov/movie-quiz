@@ -3,6 +3,7 @@ from typing import Optional
 
 from pymongo import ASCENDING, MongoClient
 
+from src.entities.settings import Settings
 from src.entities.user import User
 from src.enums import UserRole
 
@@ -73,6 +74,13 @@ class Database:
     def get_identifier(self, collection_name: str) -> int:
         identifier = self.identifiers.find_one_and_update({"_id": collection_name}, {"$inc": {"value": 1}}, return_document=True)
         return identifier["value"]
+
+    def get_settings(self, username: str) -> Settings:
+        settings = self.settings.find_one_and_update({"username": username}, {"$setOnInsert": Settings.default(username).to_dict()}, upsert=True, return_document=True)
+        return Settings.from_dict(settings)
+
+    def update_settings(self, settings: Settings) -> None:
+        self.settings.update_one({"username": settings.username}, {"$set": settings.to_dict()})
 
     def drop(self) -> None:
         self.client.drop_database(self.database_name)

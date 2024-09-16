@@ -6,8 +6,7 @@ from typing import Dict, List, Set
 import requests
 from bs4 import BeautifulSoup
 
-from src.enums import Genre, MovieType
-from src.enums.production import Production
+from src.enums import Genre, MovieType, Production
 
 
 class KinopoiskParser:

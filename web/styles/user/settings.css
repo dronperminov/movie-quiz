@@ -1,0 +1,94 @@
+.profile {
+    text-align: center;
+    margin-bottom: 0.5em;
+}
+
+.profile img {
+    max-width: 9em;
+    width: 100%;
+    border-radius: 2em;
+    vertical-align: top;
+}
+
+.profile-name {
+    border: 1px solid var(--border-color);
+    background-color: var(--block-background);
+    border-radius: 0.8em;
+    padding: 0.5em 0.7em;
+    margin-bottom: 2em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.settings-block {
+    border: 1px solid var(--border-color);
+    border-radius: 0.8em;
+    background-color: var(--block-background);
+    padding: 0.1em 0.7em;
+    margin-bottom: 2em;
+}
+
+.settings-item {
+    padding: 0.7em 0;
+}
+
+.settings-item-description {
+    color: var(--subtext-color);
+    font-size: 0.7em;
+    margin-top: -0.5em;
+    margin-bottom: 0.5em;
+}
+
+.settings-item-description li {
+    line-height: 1.6em;
+}
+
+.settings-item-label {
+    font-weight: bold;
+    cursor: pointer;
+    border-bottom: 1px dashed var(--subtext-color);
+}
+
+.settings-item-label:hover {
+    border-bottom-style: solid;
+}
+
+.settings-checkbox-item {
+    display: grid;
+    grid-template-columns: 1fr 2em;
+    align-items: center;
+    grid-gap: 0.6em;
+}
+
+.settings-input-item {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: center;
+    grid-gap: 0.5em;
+}
+
+.settings-checkbox-item .settings-name {
+    border-right: 1px solid var(--border-color);
+}
+
+.settings-item .settings-name {
+    font-weight: bold;
+}
+
+.settings-item .settings-name label {
+    cursor: pointer;
+}
+
+.settings-checkbox-item .settings-checkbox {
+    font-size: 1.2em;
+    padding-top: 0.3em;
+}
+
+.settings-input-item select {
+    width: 100%;
+}
+
+.settings-line {
+    height: 1px;
+    background-color: var(--border-color);
+}

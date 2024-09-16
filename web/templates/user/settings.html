@@ -1,0 +1,76 @@
+{% set title = "Настройки | КМС квиз Плюшевой наковальни" %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/user/settings.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+    {% set question_settings = settings.question_settings %}
+    {% set artists_group_settings = settings.artists_group_settings %}
+
+    <div class="content">
+        <h1>Настройки</h1>
+
+        <div class="profile">
+            <img src="{{user.avatar_url}}">
+        </div>
+
+        <div class="profile-name">{{user.full_name}}</div>
+
+        <h3>Общие настройки</h3>
+
+        <div class="settings-block">
+            <div class="settings-item settings-checkbox-item">
+                <div class="settings-name">
+                    <label for="show-progress">Показывать рейтинг</label>
+                </div>
+                <div class="settings-checkbox">
+                    <label class="switch-checkbox">
+                        <input type="checkbox" id="show-progress"{% if settings.show_progress %}checked{% endif %} onchange="UpdateMainSettings()">
+                        <span class="switch-checkbox-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-line"></div>
+
+            <div class="settings-item settings-checkbox-item">
+                <div class="settings-name">
+                    <label for="show-knowledge-status">Показывать статус угадывания</label>
+                </div>
+                <div class="settings-checkbox">
+                    <label class="switch-checkbox">
+                        <input type="checkbox" id="show-knowledge-status"{% if settings.show_knowledge_status %}checked{% endif %} onchange="UpdateMainSettings()">
+                        <span class="switch-checkbox-slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="settings-item-description">Статус угадывания – цветовой индикатор у исполнителей и треков, показывающий точность ответов на вопросы.</div>
+        </div>
+
+        <h3>Настройки вопросов</h3>
+
+        {% include "components/question_settings.html" %}
+    </div>
+
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/utils/settings.js?v={{version}}"></script>
+
+    <script src="/js/inputs/number_input.js?v={{version}}"></script>
+    <script src="/js/inputs/interval_input.js?v={{version}}"></script>
+    <script src="/js/inputs/balance_input.js?v={{version}}"></script>
+
+    <script src="/js/user/settings.js?v={{version}}"></script>
+    <script>
+        let answerTimeInput = new NumberInput("answer-time", 0, Infinity, /^\d+$/g, {{question_settings.answer_time}}, UpdateQuestionSettings)
+
+        let movieTypesInput = new BalanceInput("movie-types", "Необходимо выбрать хотя бы один тип КМС", { {% for movie_type, value in question_settings.movie_types.items() %}"{{movie_type.value}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let productionInput = new BalanceInput("production", "Необходимо выбрать хотя бы один вариант", { {% for production, value in question_settings.production.items() %}"{{production.value}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let votesInput = new IntervalInput("votes", true, {{question_settings.votes|tojson}}, UpdateQuestionSettings)
+        let yearsInput = new BalanceInput("years", "Необходимо выбрать хотя бы один временной промежуток", { {% for (start_year, end_year), value in question_settings.years.items() %}"{{start_year}}-{{end_year}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let questionTypesInput = new BalanceInput("question-types", "Необходимо выбрать хотя бы один тип вопроса", { {% for question_type, value in question_settings.question_types.items() %}"{{question_type.value}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let repeatIncorrectProbabilityInput = new NumberInput("repeat-incorrect-probability", 0, 100, /^\d{1,3}(\.\d+)?$/g, {{question_settings.repeat_incorrect_probability * 100}}, UpdateQuestionSettings)
+    </script>
+    {% include "components/footer.html" %}
+</body>
+</html>

@@ -7,8 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from src import movie_database
 from src.api import send_error, templates
 from src.entities.user import User
-from src.enums import MovieType
-from src.enums.production import Production
+from src.enums import MovieType, Production
 from src.query_params.movie_search import MovieSearch
 from src.query_params.movie_search_query import MovieSearchQuery
 from src.utils.auth import get_user

@@ -6,8 +6,7 @@ from src.entities.metadata import Metadata
 from src.entities.rating import Rating
 from src.entities.source import Source
 from src.entities.spoiler_text import SpoilerText
-from src.enums import Genre, MovieType
-from src.enums.production import Production
+from src.enums import Genre, MovieType, Production
 
 
 @dataclass

@@ -2,8 +2,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Union
 
-from src.enums import MovieType
-from src.enums.production import Production
+from src.enums import MovieType, Production
 from src.utils.queries import enum_query, interval_query
 
 

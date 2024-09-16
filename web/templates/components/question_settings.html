@@ -1,0 +1,213 @@
+<div class="settings-block">
+    <div class="settings-item settings-input-item">
+        <div class="settings-name">
+            <label for="answer-time">Время ответа:</label>
+        </div>
+        <div>
+            <input type="text" class="basic-input" id="answer-time" value="{{question_settings.answer_time}}" inputmode="numeric">
+        </div>
+    </div>
+    <div class="settings-item-description">Количество секунд для ответа, 0 – без ограничений.</div>
+    <div class="error" id="answer-time-error"></div>
+
+    <div class="settings-line"></div>
+
+    <div class="settings-item">
+        <div><b>Типы КМС</b></div>
+
+        <div class="balance-input" id="movie-types">
+            <div class="balance-input-mode">
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="movie-types-mode">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="movie-types-mode">Режим баланса</label>
+            </div>
+
+            <div class="balance-input-balance-mode">
+            {% for movie_type in MovieType %}
+                <div class="balance-input-option-name"><label for="movie-types-{{movie_type.value}}">{{movie_type.to_rus()}}</label></div>
+                <div class="balance-input-option-track">
+                    <input type="range" id="movie-types-{{movie_type.value}}" data-name="{{movie_type.value}}" min="0" max="100" value="50" step=5>
+                </div>
+                <div class="balance-input-option-value" id="movie-types-{{movie_type.value}}-value">50</div>
+            {% endfor %}
+            </div>
+            <div class="balance-input-checkbox-mode">
+            {% for movie_type in MovieType %}
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="movie-types-{{movie_type.value}}-checkbox">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="movie-types-{{movie_type.value}}-checkbox">{{movie_type.to_rus()}}</label>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="error" id="movie-types-error"></div>
+    </div>
+
+    <div class="settings-line"></div>
+
+    <div class="settings-item">
+        <div><b>Производство</b></div>
+
+        <div class="balance-input" id="production">
+            <div class="balance-input-mode">
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="production-mode">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="production-mode">Режим баланса</label>
+            </div>
+
+            <div class="balance-input-balance-mode">
+            {% for production in Production %}
+                <div class="balance-input-option-name"><label for="production-{{production.value}}">{{production.to_rus()}}</label></div>
+                <div class="balance-input-option-track">
+                    <input type="range" id="production-{{production.value}}" data-name="{{production.value}}" min="0" max="100" value="50" step=5>
+                </div>
+                <div class="balance-input-option-value" id="production-{{production.value}}-value">50</div>
+            {% endfor %}
+            </div>
+            <div class="balance-input-checkbox-mode">
+            {% for production in Production %}
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="production-{{production.value}}-checkbox">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="production-{{production.value}}-checkbox">{{production.to_rus()}}</label>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="error" id="production-error"></div>
+    </div>
+
+    <div class="settings-line"></div>
+
+    <div class="settings-item">
+        <div><b>Годы выхода</b></div>
+
+        <div class="balance-input" id="years">
+            <div class="balance-input-mode">
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="years-mode">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="years-mode">Режим баланса</label>
+            </div>
+
+            <div class="balance-input-balance-mode">
+            {% for start_year, end_year in question_years %}
+                <div class="balance-input-option-name"><label for="years-{{start_year}}-{{end_year}}">{{start_year if start_year else "..."}} - {{end_year if end_year else today.year}}</label></div>
+                <div class="balance-input-option-track">
+                    <input type="range" id="years-{{start_year}}-{{end_year}}" data-name="{{start_year}}-{{end_year}}" min="0" max="100" value="50" step=5>
+                </div>
+                <div class="balance-input-option-value" id="years-{{start_year}}-{{end_year}}-value">50</div>
+            {% endfor %}
+            </div>
+            <div class="balance-input-checkbox-mode">
+            {% for start_year, end_year in question_years %}
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="years-{{start_year}}-{{end_year}}-checkbox">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="years-{{start_year}}-{{end_year}}-checkbox">{{start_year if start_year else "..."}} - {{end_year if end_year else today.year}}</label>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="error" id="years-error"></div>
+    </div>
+
+    <div class="settings-line"></div>
+
+    <div class="settings-item">
+        <div><b onclick="votesInput.Clear(); UpdateQuestionSettings()">Количество оценок</b></div>
+        <div class="interval-input" id="votes">
+            <div class="interval-input-cell">
+                <span class="interval-input-label">от</span> <input class="basic-input" data-min="0" type="text" id="votes-min">
+            </div>
+            <div class="interval-input-cell">
+                <span class="interval-input-label">до</span> <input class="basic-input" data-min="0" type="text" id="votes-max">
+            </div>
+        </div>
+    </div>
+    <div class="settings-item-description">
+        <p>Возможно указание в коротком формате: <b>20К</b>, <b>1.5M</b> (подходят как английские, так и русские буквы). Для быстрого изменения доступны следующие варианты:</p>
+        <ul>
+            <li><span class="settings-item-label" onclick="votesInput.SetValue(['200K', '']); UpdateQuestionSettings()">От 200K</span> – КМС с более чем 200 тысячами оценок;</li>
+            <li><span class="settings-item-label" onclick="votesInput.SetValue(['300K', '']); UpdateQuestionSettings()">От 300K</span> – КМС с более чем 300 тысячами оценок;</li>
+        </ul>
+    </div>
+    <div class="error" id="votes-error"></div>
+
+    <div class="settings-line"></div>
+
+    <div class="settings-item">
+        <div><b>Вопросы</b></div>
+
+        <div class="balance-input" id="question-types">
+            <div class="balance-input-mode">
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="question-types-mode">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="question-types-mode">Режим баланса</label>
+            </div>
+
+            <div class="balance-input-balance-mode">
+            {% for question_type in QuestionType %}
+                <div class="balance-input-option-name"><label for="question-types-{{question_type.value}}">{{question_type.to_rus()}}</label></div>
+                <div class="balance-input-option-track">
+                    <input type="range" id="question-types-{{question_type.value}}" data-name="{{question_type.value}}" min="0" max="100" value="50" step=5>
+                </div>
+                <div class="balance-input-option-value" id="question-types-{{question_type.value}}-value">50</div>
+            {% endfor %}
+            </div>
+            <div class="balance-input-checkbox-mode">
+            {% for question_type in QuestionType %}
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="question-types-{{question_type.value}}-checkbox">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="question-types-{{question_type.value}}-checkbox">{{question_type.to_rus()}}</label>
+            {% endfor %}
+            </div>
+        </div>
+        <div class="error" id="question-types-error"></div>
+    </div>
+
+    <div class="settings-line"></div>
+
+    <div class="settings-item settings-checkbox-item">
+        <div class="settings-name">
+            <label for="hide-actor-photos">Скрывать фотографии актёров</label>
+        </div>
+        <div class="settings-checkbox">
+            <label class="switch-checkbox">
+                <input type="checkbox" id="hide-actor-photos"{% if question_settings.hide_actor_photos %}checked{% endif %} onchange="UpdateQuestionSettings()">
+                <span class="switch-checkbox-slider"></span>
+            </label>
+        </div>
+    </div>
+    <div class="settings-item-description">При использовании данной настройки в вопросах по актёрам их фотографии будут показываться размазанными, чтобы ориентироваться только на имена.</div>
+
+    <div class="settings-line"></div>
+
+    <div class="settings-item settings-input-item">
+        <div class="settings-name">
+            <label id="repeat-incorrect-probability-label" for="repeat-incorrect-probability">Вероятность повтора вопроса (%):</label>
+        </div>
+        <div>
+            <input type="text" min="0" max="100" class="basic-input" id="repeat-incorrect-probability" value="{{question_settings.repeat_incorrect_probability * 100|round(1)}}">
+        </div>
+    </div>
+
+    <div class="settings-item-description">
+        <p>Как часто можно повторно задавать вопрос, на который был дан <b>некорректный</b> ответ вместо загадывания нового. Для быстрого изменения доступны следующие варианты:</p>
+        <ul>
+            <li><span class="settings-item-label" onclick="repeatIncorrectProbabilityInput.SetValue(0); UpdateQuestionSettings()">никогда (0%)</span> – не повторять вовсе;</li>
+            <li><span class="settings-item-label" onclick="repeatIncorrectProbabilityInput.SetValue(5); UpdateQuestionSettings()">иногда (5%)</span> – примерно каждый 20-ый вопрос будет являться повтором;</li>
+            <li><span class="settings-item-label" onclick="repeatIncorrectProbabilityInput.SetValue(25); UpdateQuestionSettings()">часто (25%)</span> – примерно каждый четвёртый вопрос будет являться повтором.</li>
+        </ul></div>
+    <div class="error" id="repeat-incorrect-probability-error"></div>
+</div>
