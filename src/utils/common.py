@@ -1,5 +1,6 @@
 import hashlib
 import os
+from typing import List
 
 
 def __get_hash(filename: str) -> str:
@@ -24,3 +25,14 @@ def get_static_hash() -> str:
     hash_md5 = hashlib.md5()
     hash_md5.update(static_hash.encode("utf-8"))
     return hash_md5.hexdigest()
+
+
+def get_word_form(count: int, word_forms: List[str], only_form: bool = False) -> str:
+    index = 0
+
+    if abs(count) % 10 in {0, 5, 6, 7, 8, 9} or abs(count) % 100 in {10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20}:
+        index = 2
+    elif abs(count) % 10 in {2, 3, 4}:
+        index = 1
+
+    return word_forms[index] if only_form else f"{count} {word_forms[index]}"

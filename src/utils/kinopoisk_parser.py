@@ -40,7 +40,7 @@ class KinopoiskParser:
 
         rating = movie.get("rating", {"kp": 0, "imdb": 0})
         votes = movie.get("votes", {"kp": 0})
-        backdrop = movie.get("backdrop", {"url": None})
+        backdrop = movie.get("backdrop", {"previewUrl": None})
         facts = movie.get("facts", [])
 
         names = {name["name"] for name in movie.get("names", [])}
@@ -66,10 +66,10 @@ class KinopoiskParser:
             "duration": movie["movieLength"],
             "rating": {"rating_kp": rating.get("kp", 0), "rating_imdb": rating.get("imdb", 0), "votes_kp": votes.get("kp", 0)},
             "image_urls": [image["url"] for image in images if image["width"] >= image["height"] * 1.3],
-            "poster_url": movie["poster"]["url"],
-            "banner_url": backdrop["url"],
+            "poster_url": movie["poster"]["previewUrl"],
+            "banner_url": backdrop["previewUrl"],
             "facts": [self.__get_spoilers(text=fact["value"], names=names) for fact in facts] if facts else [],
-            "alternative_names": list(names)
+            "alternative_names": sorted(names)
         }
 
     def __filter_persons(self, persons: List[dict], profession: str) -> List[dict]:

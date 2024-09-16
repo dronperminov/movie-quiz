@@ -1,0 +1,118 @@
+.short-movies {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 1em;
+    overflow: auto;
+    margin-bottom: 1.5em;
+}
+
+.short-movie {
+    width: 100px;
+    font-size: 0.5em;
+    text-align: center;
+}
+
+.short-movie-header {
+    display: grid;
+    grid-template-columns: 1fr 1em;
+    align-items: center;
+}
+
+
+.movie {
+    display: grid;
+    grid-template-columns: 5.5em 1fr 1.5em;
+    grid-gap: 0.9em;
+    margin-bottom: 1em;
+    background: var(--block-background);
+    padding: 5px;
+    border-radius: 1em;
+}
+
+.movie-image {
+    cursor: pointer;
+    position: relative;
+}
+
+.movie-image:hover img {
+    padding: 0;
+    border: 2px solid var(--main-color);
+}
+
+.movie-image img {
+    padding: 2px;
+    width: 100%;
+    border-radius: 8px;
+    vertical-align: top;
+    aspect-ratio: 1 / 1.5;
+}
+
+.movie-image .movie-rating {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}
+
+.movie-rating {
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+    font-family: Montserrat;
+    font-size: 0.7em;
+    color: #fff;
+    display: inline-block;
+}
+
+.movie-data {
+    display: grid;
+    grid-template-rows: max-content;
+}
+
+.movie-name {
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-bottom: 0.4em;
+}
+
+.movie-name a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.movie-name a:hover {
+    color: var(--main-color);
+}
+
+.movie-stats {
+    color: var(--subtext-color);
+    font-size: 0.8em;
+    margin-bottom: 0.2em;
+    vertical-align: middle;
+}
+
+.movie-short-info {
+    color: var(--subtext-color);
+    font-size: 0.9em;
+    margin-bottom: 10px;
+    vertical-align: middle;
+}
+
+.movie-note {
+    font-size: 0.95em;
+    height: 100%;
+}
+
+.movie-controls {
+    align-content: end;
+}
+
+.movie-controls div {
+    margin-bottom: 0.4em;
+}
+
+.movie-menu {
+    display: grid;
+    align-items: center;
+    justify-content: end;
+    padding-right: 0.4em;
+}

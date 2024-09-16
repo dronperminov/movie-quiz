@@ -8,6 +8,7 @@ from src.entities.metadata import Metadata
 from src.entities.movie import Movie
 from src.entities.person import Person
 from src.entities.source import KinopoiskSource
+from src.query_params.movie_search import MovieSearch
 from src.utils.kinopoisk_parser import KinopoiskParser
 
 
@@ -23,6 +24,36 @@ class MovieDatabase:
     def get_movie(self, movie_id: int) -> Optional[Movie]:
         movie = self.database.movies.find_one({"movie_id": movie_id})
         return Movie.from_dict(movie) if movie else None
+
+    def get_movies_persons(self, movies: List[Movie]) -> Dict[int, Person]:
+        person_ids = [actor.person_id for movie in movies for actor in movie.actors + movie.directors]
+        persons = self.database.persons.find({"person_id": {"$in": person_ids}})
+        return {person["person_id"]: Person.from_dict(person) for person in persons}
+
+    def get_last_movies(self, order_field: str, order_type: int, count: int) -> List[Movie]:
+        _, movies = self.search_movies(MovieSearch(order_type=order_type, order=order_field, page_size=count, page=0))
+        return movies
+
+    def search_movies(self, params: MovieSearch) -> Tuple[int, List[Movie]]:
+        results = self.database.movies.aggregate([
+            {
+                "$addFields": {
+                    "name_lowercase": {"$replaceAll": {"input": {"$toLower": "$name"}, "find": "Ё", "replacement": "Е"}}
+                }
+            },
+            {"$match": params.to_query()},
+            {"$sort": {params.order: params.order_type, "_id": 1}},
+            {
+                "$facet": {
+                    "movies": [{"$skip": params.page_size * params.page}, {"$limit": params.page_size}],
+                    "total": [{"$count": "count"}]
+                }
+            }
+        ])
+
+        results = list(results)[0]
+        total = 0 if not results["total"] else results["total"][0]["count"]
+        return total, [Movie.from_dict(movie) for movie in results["movies"]]
 
     def add_movie(self, movie: Movie, username: str) -> None:
         action = AddMovieAction(username=username, timestamp=datetime.now(), movie_id=movie.movie_id)
