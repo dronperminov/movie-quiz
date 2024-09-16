@@ -490,6 +490,14 @@ h2 + .description {
     text-align: center;
 }
 
+.search-results {
+    color: var(--subtext-color);
+    font-size: 0.8em;
+    text-align: center;
+    margin-top: -0.8em;
+    margin-bottom: 0.8em;
+}
+
 @media (max-width: 767px) {
     :root {
         --max-width: unset;

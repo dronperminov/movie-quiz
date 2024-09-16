@@ -111,8 +111,9 @@ Movie.prototype.BuildPagePersons = function(parent, header, persons) {
         let actorBlock = MakeElement("movie-actor", container)
         let person = this.params.personId2person[`${actor.person_id}`]
 
-        MakeElement("", actorBlock, {src: person.photo_url, loading: "lazy"}, "img")
-        MakeElement("", actorBlock, {innerText: person.name})
+        let link = MakeElement("", actorBlock, {href: `/persons/${actor.person_id}`}, "a")
+        MakeElement("", link, {src: person.photo_url, loading: "lazy"}, "img")
+        MakeElement("link", actorBlock, {href: `/persons/${actor.person_id}`, innerText: person.name}, "a")
     }
 }
 
@@ -206,10 +207,11 @@ Movie.prototype.BuildInfoActors = function(parent) {
 
     for (let actor of this.actors) {
         let infoImage = MakeElement("info-image info-actor", actorsDiv)
-
         let person = this.params.personId2person[`${actor.person_id}`]
-        MakeElement("", infoImage, {src: person.photo_url, loading: "lazy"}, "img")
-        MakeElement("", infoImage, {innerText: person.name})
+
+        let link = MakeElement("", infoImage, {href: `/persons/${actor.person_id}`}, "a")
+        MakeElement("", link, {src: person.photo_url, loading: "lazy"}, "img")
+        MakeElement("link", infoImage, {href: `/persons/${actor.person_id}`, innerText: person.name}, "a")
     }
 }
 
@@ -221,11 +223,11 @@ Movie.prototype.BuildRating = function(parent) {
 }
 
 Movie.prototype.GetShortInfo = function() {
-    return [this.countries[0], this.genres.ToRus(1)].join(" • ")
+    return [this.countries.slice(0, 2).join(", "), this.FormatVotes()].join(" • ")
 }
 
 Movie.prototype.GetStats = function() {
-    return [this.year, this.FormatVotes(), this.movieType.ToRus()].join(" | ")
+    return [this.year, this.genres.ToRus(2), this.movieType.ToRus()].join(" | ")
 }
 
 Movie.prototype.GetMainInfo = function() {
@@ -273,5 +275,12 @@ Movie.prototype.FormatDuration = function() {
 }
 
 Movie.prototype.GetDirectors = function() {
-    return this.directors.map(director => this.params.personId2person[`${director.person_id}`].name).join(", ")
+    let directors = []
+
+    for (let director of this.directors) {
+        let person = this.params.personId2person[`${director.person_id}`]
+        directors.push(`<a class="link" href="/persons/${person.person_id}">${person.name}</a>`)
+    }
+
+    return directors.join(", ")
 }

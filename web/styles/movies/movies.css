@@ -48,8 +48,8 @@
 
 .movie-image .movie-rating {
     position: absolute;
-    right: 5px;
-    bottom: 5px;
+    left: 5px;
+    top: 5px;
 }
 
 .movie-rating {

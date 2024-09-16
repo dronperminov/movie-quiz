@@ -13,6 +13,7 @@ from src.entities.movie import Movie
 from src.entities.person import Person
 from src.entities.source import KinopoiskSource
 from src.query_params.movie_search import MovieSearch
+from src.query_params.person_movies import PersonMovies
 from src.utils.images import resize_image
 from src.utils.kinopoisk_parser import KinopoiskParser
 
@@ -77,11 +78,11 @@ class MovieDatabase:
             poster_url = movie.poster_url
 
             try:
-                if not banner_url.startswith("/images/movie_banners/"):
+                if banner_url and not banner_url.startswith("/images/movie_banners/"):
                     self.__download_kinopoisk_image(banner_url, os.path.join(output_path, "movie_banners", f"{movie.movie_id}.webp"), max_width=1000)
                     banner_url = f"/images/movie_banners/{movie.movie_id}.webp"
 
-                if not poster_url.startswith("/images/movie_posters/"):
+                if poster_url and not poster_url.startswith("/images/movie_posters/"):
                     self.__download_kinopoisk_image(poster_url, os.path.join(output_path, "movie_posters", f"{movie.movie_id}.webp"), max_width=128)
                     poster_url = f"/images/movie_posters/{movie.movie_id}.webp"
 
@@ -101,7 +102,7 @@ class MovieDatabase:
             person = Person.from_dict(person)
 
             try:
-                self.__download_kinopoisk_image(person.photo_url, os.path.join(output_path, "persons", f"{person.person_id}.webp"), max_width=128)
+                self.__download_kinopoisk_image(person.photo_url, os.path.join(output_path, "persons", f"{person.person_id}.webp"), max_width=250)
                 self.update_person(person_id=person.person_id, diff=person.get_diff({"photo_url": f"/images/persons/{person.person_id}.webp"}), username=username)
             except ValueError:
                 self.logger.error(f'Unable to download person photo "{person.person_id}"')
@@ -135,6 +136,12 @@ class MovieDatabase:
     def get_person(self, person_id: int) -> Optional[Person]:
         person = self.database.persons.find_one({"person_id": person_id})
         return Person.from_dict(person) if person else None
+
+    def get_person_movies(self, params: PersonMovies) -> Tuple[int, List[Movie]]:
+        query = {"$or": [{"actors.person_id": params.person_id}, {"directors.person_id": params.person_id}]}
+        total = self.database.movies.count_documents(query)
+        movies = self.database.movies.find(query).sort({"rating.votes_kp": -1, "_id": 1}).skip(params.page * params.page_size).limit(params.page_size)
+        return total, [Movie.from_dict(movie) for movie in movies]
 
     def add_person(self, person: Person, username: str) -> None:
         action = AddPersonAction(username=username, timestamp=datetime.now(), person_id=person.person_id)

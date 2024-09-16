@@ -115,14 +115,6 @@
     fill: var(--main-color) !important;
 }
 
-.search-results {
-    color: var(--subtext-color);
-    font-size: 0.8em;
-    text-align: center;
-    margin-top: -0.8em;
-    margin-bottom: 0.8em;
-}
-
 .search-filters-popup {
     position: fixed;
     background: var(--block-background);
