@@ -41,7 +41,7 @@ class KinopoiskParser:
 
         rating = movie.get("rating", {"kp": 0, "imdb": 0})
         votes = movie.get("votes", {"kp": 0})
-        backdrop = movie.get("backdrop", {"previewUrl": None})
+        backdrop = movie.get("backdrop", {"url": None})
         facts = movie.get("facts", [])
 
         names = {name["name"] for name in movie.get("names", [])}
@@ -63,12 +63,12 @@ class KinopoiskParser:
             "countries": countries,
             "genres": [Genre.from_kinopoisk(genre["name"]).value for genre in movie["genres"]],
             "directors": self.__filter_persons(movie["persons"], "director"),
-            "actors": self.__filter_persons(movie["persons"], "actor"),
+            "actors": [actor for actor in self.__filter_persons(movie["persons"], "actor") if actor["description"]],
             "duration": movie["movieLength"],
             "rating": {"rating_kp": rating.get("kp", 0), "rating_imdb": rating.get("imdb", 0), "votes_kp": votes.get("kp", 0)},
-            "image_urls": [image["url"] for image in images if image["width"] >= image["height"] * 1.3],
-            "poster_url": movie["poster"]["previewUrl"],
-            "banner_url": backdrop["previewUrl"],
+            "image_urls": [self.__fix_url(image["url"]) for image in images if image["width"] >= image["height"] * 1.3],
+            "poster_url": self.__fix_url(movie["poster"]["previewUrl"]),
+            "banner_url": self.__fix_url(backdrop["url"]) if backdrop["url"] is not None else None,
             "facts": [self.__get_spoilers(text=BeautifulSoup(fact["value"], "html.parser").text, names=names) for fact in facts] if facts else [],
             "alternative_names": sorted(names)
         }
@@ -77,13 +77,13 @@ class KinopoiskParser:
         filtered = []
 
         for person in persons:
-            if person["enProfession"] != profession:
+            if person["enProfession"] != profession or not person["name"]:
                 continue
 
             filtered.append({
                 "kinopoisk_id": person["id"],
                 "name": person["name"],
-                "photo_url": person["photo"],
+                "photo_url": self.__fix_url(person["photo"]),
                 "description": person["description"] if person["description"] else ""
             })
 
@@ -91,6 +91,23 @@ class KinopoiskParser:
 
     def __get_spoilers(self, text: str, names: Set[str]) -> dict:
         return {"text": text, "spoilers": []}  # TODO
+
+    def __fix_url(self, url: str) -> str:
+        kp2api = {
+            "https://avatars.mds.yandex.net/get-ott/": "https://image.openmoviedb.com/kinopoisk-ott-images/",
+            "https://avatars.mds.yandex.net/get-kinopoisk-image/": "https://image.openmoviedb.com/kinopoisk-images/",
+            "https://st.kp.yandex.net/images": "https://image.openmoviedb.com/kinopoisk-st-images/",
+            "https://www.themoviedb.org/t/p/": "https://image.openmoviedb.com/tmdb-images/",
+            "https://imagetmdb.com/t/p/": "https://image.openmoviedb.com/tmdb-images/",
+        }
+
+        for orig_url, api_url in kp2api.items():
+            url = url.replace(api_url, orig_url)
+
+        if url.endswith("/x1000"):
+            url = f"{url[:-6]}/orig"
+
+        return url
 
     def __get_movies(self, query_params: List[str]) -> List[dict]:
         params = ["limit=250", *[f"selectFields={field}" for field in self.movie_fields], *query_params]

@@ -1,6 +1,10 @@
 import logging
+import os
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
+from urllib.error import HTTPError, URLError
+
+import wget
 
 from src import Database
 from src.entities.history_action import AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction
@@ -9,6 +13,7 @@ from src.entities.movie import Movie
 from src.entities.person import Person
 from src.entities.source import KinopoiskSource
 from src.query_params.movie_search import MovieSearch
+from src.utils.images import resize_image
 from src.utils.kinopoisk_parser import KinopoiskParser
 
 
@@ -54,6 +59,52 @@ class MovieDatabase:
         results = list(results)[0]
         total = 0 if not results["total"] else results["total"][0]["count"]
         return total, [Movie.from_dict(movie) for movie in results["movies"]]
+
+    def download_movie_images(self, output_path: str, username: str) -> None:
+        query = {
+            "$or": [
+                {"image_urls": {"$ne": [], "$not": {"$regex": "^/images/movie_images/.*"}}},
+                {"banner_url": {"$not": {"$regex": "^/images/movie_banners/.*"}}},
+                {"poster_url": {"$not": {"$regex": "^/images/movie_posters/.*"}}}
+            ]
+        }
+
+        for movie in self.database.movies.find(query):
+            movie = Movie.from_dict(movie)
+
+            image_urls = []
+            banner_url = movie.banner_url
+            poster_url = movie.poster_url
+
+            try:
+                if not banner_url.startswith("/images/movie_banners/"):
+                    self.__download_kinopoisk_image(banner_url, os.path.join(output_path, "movie_banners", f"{movie.movie_id}.webp"), max_width=1000)
+                    banner_url = f"/images/movie_banners/{movie.movie_id}.webp"
+
+                if not poster_url.startswith("/images/movie_posters/"):
+                    self.__download_kinopoisk_image(poster_url, os.path.join(output_path, "movie_posters", f"{movie.movie_id}.webp"), max_width=128)
+                    poster_url = f"/images/movie_posters/{movie.movie_id}.webp"
+
+                for i, image_url in enumerate(movie.image_urls):
+                    if not image_url.startswith("/images/movie_images"):
+                        self.__download_kinopoisk_image(image_url, os.path.join(output_path, "movie_images", f"{movie.movie_id}", f"{i + 1}.webp"), max_width=1000)
+
+                    image_urls.append(f"/images/movie_images/{movie.movie_id}/{i + 1}.webp")
+
+                diff = movie.get_diff({"image_urls": image_urls, "banner_url": banner_url, "poster_url": poster_url})
+                self.update_movie(movie_id=movie.movie_id, diff=diff, username=username)
+            except ValueError:
+                self.logger.error(f'Unable to download movie images "{movie.movie_id}"')
+
+    def download_person_images(self, output_path: str, username: str) -> None:
+        for person in self.database.persons.find({"photo_url": {"$not": {"$regex": "^/images/persons/.*"}}}):
+            person = Person.from_dict(person)
+
+            try:
+                self.__download_kinopoisk_image(person.photo_url, os.path.join(output_path, "persons", f"{person.person_id}.webp"), max_width=128)
+                self.update_person(person_id=person.person_id, diff=person.get_diff({"photo_url": f"/images/persons/{person.person_id}.webp"}), username=username)
+            except ValueError:
+                self.logger.error(f'Unable to download person photo "{person.person_id}"')
 
     def add_movie(self, movie: Movie, username: str) -> None:
         action = AddMovieAction(username=username, timestamp=datetime.now(), movie_id=movie.movie_id)
@@ -161,3 +212,16 @@ class MovieDatabase:
         })
 
         self.add_movie(movie=movie, username=username)
+
+    def __download_kinopoisk_image(self, url: str, image_path: str, max_width: int) -> None:
+        os.makedirs(os.path.dirname(image_path), exist_ok=True)
+
+        if os.path.exists(image_path):
+            os.remove(image_path)
+
+        try:
+            wget.download(url, image_path)
+            resize_image(image_path, max_width=max_width)
+            return
+        except (FileNotFoundError, HTTPError, URLError, ValueError):
+            raise ValueError("Unable to download image")

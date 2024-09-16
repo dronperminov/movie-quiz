@@ -3,6 +3,7 @@ fastapi
 Jinja2
 Levenshtein
 numpy
+opencv-python
 passlib[bcrypt]
 pydub
 pymongo
