@@ -23,6 +23,7 @@ function UpdateQuestionSettings() {
             return
         }
 
-        ShowNotification(`Настройки вопросов успешно обновлены<br>`, "success-notification", 1000)
+        let movies = GetWordForm(response.movies, ["КМС удовлетворяет", "КМС удовлетворяют", "КМС удовлетворяют"])
+        ShowNotification(`Настройки вопросов успешно обновлены<br>${movies} выбранным настройкам`, "success-notification", 1000)
     })
 }

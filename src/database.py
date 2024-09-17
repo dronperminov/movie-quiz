@@ -14,6 +14,7 @@ class Database:
     users = None
     roles = None
     settings = None
+    questions = None
     movies = None
     tracks = None
     persons = None
@@ -40,6 +41,10 @@ class Database:
 
         self.settings = database["settings"]
         self.settings.create_index([("username", ASCENDING)], unique=True)
+
+        self.questions = database["questions"]
+        self.questions.create_index([("username", ASCENDING)])
+        self.questions.create_index([("datetime", ASCENDING)])
 
         self.movies = database["movies"]
         self.movies.create_index([("movie_id", ASCENDING)], unique=True)

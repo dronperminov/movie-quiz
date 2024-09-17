@@ -1,0 +1,40 @@
+{% set title = "Тренировка | Музыкальный квиз Плюшевой наковальни" %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/utils/history.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/utils/info_panels.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/movies/movies.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/user/question.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <div id="question"></div>
+    </div>
+
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+    <script src="/js/utils/swipe_handler.js?v={{version}}"></script>
+    <script src="/js/utils/info_panels.js?v={{version}}"></script>
+    <script src="/js/utils/parse.js?v={{version}}"></script>
+    <script src="/js/utils/history.js?v={{version}}"></script>
+    
+    <script src="/js/entities/movie_type.js?v={{version}}"></script>
+    <script src="/js/entities/genre.js?v={{version}}"></script>
+    <script src="/js/entities/production.js?v={{version}}"></script>
+    <script src="/js/entities/metadata.js?v={{version}}"></script>
+    <script src="/js/entities/movie.js?v={{version}}"></script>
+    <script src="/js/entities/question.js?v={{version}}"></script>
+
+    <script src="/js/inputs/multi_select.js?v={{version}}"></script>
+
+    <script src="/js/user/question.js?v={{version}}"></script>
+    <script>
+        let infos = new InfoPanels()
+
+        let question = new Question("/answer-question", GetQuestion)
+        question.Build({{question|tojson}}, {{movie|tojson}}, {personId2person: {{person_id2person|tojson}}})
+    </script>
+    {% include "components/footer.html" %}
+</body>
+</html>

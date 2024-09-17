@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass
 from typing import List
 
@@ -6,7 +7,7 @@ from src.entities.metadata import Metadata
 from src.entities.rating import Rating
 from src.entities.source import Source
 from src.entities.spoiler_text import SpoilerText
-from src.enums import Genre, MovieType, Production
+from src.enums import Genre, MovieType, Production, QuestionType
 
 
 @dataclass
@@ -104,3 +105,32 @@ class Movie:
                 diff[field] = {"prev": movie_data[field], "new": data[field]}
 
         return diff
+
+    def get_question_types(self) -> List[QuestionType]:
+        question_types = []
+
+        if self.slogan:
+            question_types.append(QuestionType.MOVIE_BY_SLOGAN)
+
+        if self.short_description.text:
+            question_types.append(QuestionType.MOVIE_BY_SHORT_DESCRIPTION)
+
+        if self.description.text:
+            question_types.append(QuestionType.MOVIE_BY_DESCRIPTION)
+
+        if self.image_urls:
+            question_types.append(QuestionType.MOVIE_BY_IMAGE)
+
+        if self.actors and self.movie_type in [MovieType.MOVIE, MovieType.SERIES]:
+            question_types.append(QuestionType.MOVIE_BY_ACTORS)
+
+        return question_types
+
+    def get_question_title(self, end: str = "") -> str:
+        return f"Назовите {self.movie_type.to_rus()}{end}"
+
+    def get_question_answer(self) -> str:
+        return f'<a class="link" href="/movies/{self.movie_id}">{self.name}</a>'
+
+    def get_random_image_url(self) -> str:
+        return random.choice(self.image_urls)

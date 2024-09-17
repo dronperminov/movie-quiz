@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 
-from src import database
+from src import database, questions_database
 from src.api import login_redirect, templates
 from src.entities.main_settings import MainSettings
 from src.entities.question_settings import QUESTION_YEARS, QuestionSettings
@@ -53,4 +53,5 @@ def update_question_settings(question_settings: QuestionSettings, user: Optional
 
     settings = database.get_settings(username=user.username)
     database.update_settings(settings.update_question(question_settings))
-    return JSONResponse({"status": "success"})
+    movies = len(questions_database.get_question_movies(settings.question_settings))
+    return JSONResponse({"status": "success", "movies": movies})

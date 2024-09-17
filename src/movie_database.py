@@ -31,6 +31,10 @@ class MovieDatabase:
         movie = self.database.movies.find_one({"movie_id": movie_id})
         return Movie.from_dict(movie) if movie else None
 
+    def get_movies(self, movie_ids: List[int]) -> List[Movie]:
+        movie_id2movie = {movie["movie_id"]: movie for movie in self.database.movies.find({"movie_id": {"$in": movie_ids}})}
+        return [Movie.from_dict(movie_id2movie[movie_id]) for movie_id in movie_ids]
+
     def get_movies_persons(self, movies: List[Movie]) -> Dict[int, Person]:
         person_ids = [actor.person_id for movie in movies for actor in movie.actors + movie.directors]
         persons = self.database.persons.find({"person_id": {"$in": person_ids}})
