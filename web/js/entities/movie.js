@@ -83,6 +83,7 @@ Movie.prototype.BuildPage = function(blockId = "movie") {
     this.BuildPagePersons(movie, "Актёры", this.actors)
     this.BuildPagePersons(movie, "Режиссёр" + (this.directors.length > 1 ? "ы" : ""), this.directors)
     this.BuildPageFacts(movie)
+    this.BuildAdmin(movie)
 }
 
 Movie.prototype.BuildPageImages = function(parent) {
