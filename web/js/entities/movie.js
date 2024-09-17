@@ -167,6 +167,7 @@ Movie.prototype.BuildInfo = function() {
         MakeElement("info-line", info, {innerHTML: `<b>Другие названия</b>: ${this.alternativeNames.join(", ")}`})
 
     this.metadata.BuildInfo(info)
+    this.BuildAdmin(info)
 
     return info
 }
@@ -212,6 +213,21 @@ Movie.prototype.BuildInfoActors = function(parent) {
         let link = MakeElement("", infoImage, {href: `/persons/${actor.person_id}`}, "a")
         MakeElement("", link, {src: person.photo_url, loading: "lazy"}, "img")
         MakeElement("link", infoImage, {href: `/persons/${actor.person_id}`, innerText: person.name}, "a")
+    }
+}
+
+Movie.prototype.BuildAdmin = function(parent) {
+    let adminBlock = MakeElement("admin-buttons admin-block", parent)
+    let buttons = []
+
+    let historyButton = MakeElement("basic-button gradient-button", adminBlock, {innerText: "История изменений"}, "button")
+    buttons.push(historyButton)
+    historyButton.addEventListener("click", () => ShowHistory(`/movie-history/${this.movieId}`))
+
+    if (this.source.name == "kinopoisk") {
+        let button = MakeElement("basic-button gradient-button", adminBlock, {innerText: "Распарсить"}, "button")
+        buttons.push(button)
+        button.addEventListener("click", () => ParseMovies(buttons, [this.source.kinopoisk_id]))
     }
 }
 

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from src import movie_database
+from src import database, movie_database
 from src.api import send_error, templates
 from src.entities.user import User
 from src.enums import MovieType, Production
@@ -72,3 +72,9 @@ def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLRe
         get_word_form=get_word_form
     )
     return HTMLResponse(content=content)
+
+
+@router.get("/movie-history/{movie_id}")
+def get_movie_history(movie_id: int) -> JSONResponse:
+    history = list(database.history.find({"movie_id": movie_id}, {"_id": 0}).sort("timestamp", -1))
+    return JSONResponse({"status": "success", "history": jsonable_encoder(history)})
