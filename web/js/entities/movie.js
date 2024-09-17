@@ -294,6 +294,9 @@ Movie.prototype.FormatDuration = function() {
     let hours = `${Math.floor(duration / 60)}`
     let minutes = `${duration % 60}`.padStart(2, '0')
 
+    if (hours == 0)
+        return `${duration} мин.`
+
     return `${hours} ч. ${minutes} мин.`
 }
 
