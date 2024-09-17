@@ -134,8 +134,10 @@ Movie.prototype.BuildInfo = function() {
     let info = MakeElement("info", null, {"id": `info-movie-${this.movieId}`})
     let closeIcon = MakeElement("close-icon", info, {title: "Закрыть"})
 
-    let infoImage = MakeElement("info-image", info)
-    MakeElement("", infoImage, {src: this.bannerUrl, loading: "lazy"}, "img")
+    if (this.bannerUrl !== null) {
+        let infoImage = MakeElement("info-image", info)
+        MakeElement("", infoImage, {src: this.bannerUrl, loading: "lazy"}, "img")
+    }
 
     this.BuildName(info, "info-header-line")
 
