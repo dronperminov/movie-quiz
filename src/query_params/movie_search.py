@@ -9,7 +9,7 @@ from src.utils.queries import enum_query, interval_query
 @dataclass
 class MovieSearch:
     query: str = ""
-    order: str = "listen_count"
+    order: str = "rating.votes_kp"
     order_type: int = -1
     movie_type: Dict[MovieType, bool] = field(default_factory=dict)
     production: Dict[Production, bool] = field(default_factory=dict)

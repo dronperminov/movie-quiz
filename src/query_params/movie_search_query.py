@@ -33,7 +33,7 @@ class MovieSearchQuery:
 
         return MovieSearch(
             query=self.query if self.query is not None else "",
-            order=self.order if self.order is not None else "listen_count",
+            order=self.order if self.order is not None else "rating.votes_kp",
             order_type=self.order_type if self.order_type is not None else -1,
             movie_type=json.loads(self.movie_type) if self.movie_type is not None else {},
             production=json.loads(self.production) if self.production is not None else {},
