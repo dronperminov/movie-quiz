@@ -73,29 +73,34 @@ class MovieDatabase:
         for movie in self.database.movies.find(query):
             movie = Movie.from_dict(movie)
 
-            image_urls = []
+            image_urls = [image_url for image_url in movie.image_urls]
             banner_url = movie.banner_url
             poster_url = movie.poster_url
 
-            try:
-                if banner_url and not banner_url.startswith("/images/movie_banners/"):
+            if banner_url and not banner_url.startswith("/images/movie_banners/"):
+                try:
                     self.__download_kinopoisk_image(banner_url, os.path.join(output_path, "movie_banners", f"{movie.movie_id}.webp"), max_width=1000)
                     banner_url = f"/images/movie_banners/{movie.movie_id}.webp"
+                except ValueError:
+                    self.logger.error(f'Unable to download movie banner "{movie.movie_id}"')
 
-                if poster_url and not poster_url.startswith("/images/movie_posters/"):
+            if poster_url and not poster_url.startswith("/images/movie_posters/"):
+                try:
                     self.__download_kinopoisk_image(poster_url, os.path.join(output_path, "movie_posters", f"{movie.movie_id}.webp"), max_width=128)
                     poster_url = f"/images/movie_posters/{movie.movie_id}.webp"
+                except ValueError:
+                    self.logger.error(f'Unable to download movie poster "{movie.movie_id}"')
 
-                for i, image_url in enumerate(movie.image_urls):
-                    if not image_url.startswith("/images/movie_images"):
+            for i, image_url in enumerate(movie.image_urls):
+                if not image_url.startswith("/images/movie_images"):
+                    try:
                         self.__download_kinopoisk_image(image_url, os.path.join(output_path, "movie_images", f"{movie.movie_id}", f"{i + 1}.webp"), max_width=1000)
+                        image_urls[i] = f"/images/movie_images/{movie.movie_id}/{i + 1}.webp"
+                    except ValueError:
+                        self.logger.error(f'Unable to download movie image {i + 1} "{movie.movie_id}"')
 
-                    image_urls.append(f"/images/movie_images/{movie.movie_id}/{i + 1}.webp")
-
-                diff = movie.get_diff({"image_urls": image_urls, "banner_url": banner_url, "poster_url": poster_url})
-                self.update_movie(movie_id=movie.movie_id, diff=diff, username=username)
-            except ValueError:
-                self.logger.error(f'Unable to download movie images "{movie.movie_id}"')
+            diff = movie.get_diff({"image_urls": image_urls, "banner_url": banner_url, "poster_url": poster_url})
+            self.update_movie(movie_id=movie.movie_id, diff=diff, username=username)
 
     def download_person_images(self, output_path: str, username: str) -> None:
         for person in self.database.persons.find({"photo_url": {"$not": {"$regex": "^/images/persons/.*"}}}):
