@@ -277,7 +277,7 @@ Movie.prototype.FormatVotes = function() {
 }
 
 Movie.prototype.GetRatingColor = function(rating) {
-    if (rating > 7.5)
+    if (rating > 7)
         return "#3bb33b"
 
     if (rating > 6)
