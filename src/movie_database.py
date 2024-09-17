@@ -7,7 +7,7 @@ from urllib.error import HTTPError, URLError
 import wget
 
 from src import Database
-from src.entities.history_action import AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction
+from src.entities.history_action import AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction, RemoveMovieAction, RemovePersonAction
 from src.entities.metadata import Metadata
 from src.entities.movie import Movie
 from src.entities.person import Person
@@ -130,6 +130,20 @@ class MovieDatabase:
         self.database.history.insert_one(action.to_dict())
         self.logger.info(f'Updated movie "{movie["name"]}" ({movie_id}) by @{username} (keys: {[key for key in diff]})')
 
+    def remove_movie(self, movie_id: int, username: str) -> None:
+        movie = self.database.movies.find_one({"movie_id": movie_id}, {"name": 1, "actors": 1, "directors": 1})
+        assert movie is not None
+
+        action = RemoveMovieAction(username=username, timestamp=datetime.now(), movie_id=movie_id)
+        self.database.movies.delete_one({"movie_id": movie_id})
+
+        for person in self.database.persons.find({"person_id": {"$in": [person["person_id"] for person in movie["actors"] + movie["directors"]]}}):
+            if not self.database.movies.find_one({"$or": [{"actors.person_id": person["person_id"]}, {"directors.person_id": person["person_id"]}]}, {"_id": 1}):
+                self.remove_person(person_id=person["person_id"], username=username)
+
+        self.database.history.insert_one(action.to_dict())
+        self.logger.info(f'Removed movie "{movie["name"]}" ({movie_id}) by @{username}')
+
     def get_persons_count(self) -> int:
         return self.database.persons.count_documents({})
 
@@ -165,6 +179,19 @@ class MovieDatabase:
         self.database.persons.update_one({"person_id": person_id}, {"$set": new_values})
         self.database.history.insert_one(action.to_dict())
         self.logger.info(f'Updated person "{person["name"]}" ({person_id}) by @{username} (keys: {[key for key in diff]})')
+
+    def remove_person(self, person_id: int, username: str) -> None:
+        person = self.database.persons.find_one({"person_id": person_id}, {"name": 1})
+        assert person is not None
+
+        if self.database.movies.find_one({"$or": [{"actors.person_id": person_id}, {"directors.person_id": person_id}]}):
+            self.logger.error(f'Unable to remove person "{person["name"]}" ({person_id})')
+            return
+
+        action = RemovePersonAction(username=username, timestamp=datetime.now(), person_id=person_id)
+        self.database.persons.delete_one({"person_id": person_id})
+        self.database.history.insert_one(action.to_dict())
+        self.logger.info(f'Removed person "{person["name"]}" ({person_id}) by @{username}')
 
     def add_from_kinopoisk(self, movies: List[dict], username: str) -> Tuple[int, int]:
         movies_count = self.get_movies_count()

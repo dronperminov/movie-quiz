@@ -7,7 +7,8 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from src import database, movie_database
 from src.api import send_error, templates
 from src.entities.user import User
-from src.enums import MovieType, Production
+from src.enums import MovieType, Production, UserRole
+from src.query_params.movie_remove import MovieRemove
 from src.query_params.movie_search import MovieSearch
 from src.query_params.movie_search_query import MovieSearchQuery
 from src.utils.auth import get_user
@@ -72,6 +73,22 @@ def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLRe
         get_word_form=get_word_form
     )
     return HTMLResponse(content=content)
+
+
+@router.post("/remove-movie")
+def remove_movie(params: MovieRemove, user: Optional[User] = Depends(get_user)) -> JSONResponse:
+    if not user:
+        return JSONResponse({"status": "error", "message": "Пользователь не авторизован"})
+
+    if user.role != UserRole.OWNER:
+        return JSONResponse({"status": "error", "message": "Пользователь не является администратором"})
+
+    movie = movie_database.get_movie(movie_id=params.movie_id)
+    if movie is None:
+        return JSONResponse({"status": "error", "message": f"Не удалось найти фильм с movie_id = {params.movie_id} в базе"})
+
+    movie_database.remove_movie(movie_id=params.movie_id, username=user.username)
+    return JSONResponse({"status": "success"})
 
 
 @router.get("/movie-history/{movie_id}")

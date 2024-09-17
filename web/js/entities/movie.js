@@ -232,6 +232,10 @@ Movie.prototype.BuildAdmin = function(parent) {
         buttons.push(button)
         button.addEventListener("click", () => ParseMovies(buttons, [this.source.kinopoisk_id]))
     }
+
+    let removeButton = MakeElement("basic-button red-button", adminBlock, {innerText: `Удалить ${this.movieType.ToRus()}`}, "button")
+    buttons.push(removeButton)
+    removeButton.addEventListener("click", () => this.Remove(buttons))
 }
 
 Movie.prototype.BuildRating = function(parent) {
@@ -302,4 +306,24 @@ Movie.prototype.GetDirectors = function() {
     }
 
     return directors.join(", ")
+}
+
+Movie.prototype.Remove = function(buttons) {
+    if (!confirm(`Вы уверены, что хотите удалить ${this.movieType.ToRus()} "${this.name}"?`))
+        return
+
+    for (let button of buttons)
+        button.setAttribute("disabled", "")
+
+    SendRequest("/remove-movie", {movie_id: this.movieId}).then(response => {
+        if (response.status != SUCCESS_STATUS) {
+            for (let button of buttons)
+                button.removeAttribute("disabled")
+
+            ShowNotification(`Не удалось удалить ${this.movieType.ToRus()} "${this.name}".<br><b>Причина</b>: ${response.message}`, "error-notification", 3500)
+            return
+        }
+
+        location.reload()
+    })
 }
