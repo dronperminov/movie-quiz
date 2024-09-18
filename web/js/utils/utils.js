@@ -145,3 +145,13 @@ function Ratio(s, t) {
     let distance = LevenshteinDistance(s, t)
     return 1 - distance / Math.max(len, 1)
 }
+
+function GetLetterLanguage(letter) {
+    if (letter.match(/[a-z]/g) !== null)
+        return "латинская"
+
+    if (letter.match(/\d/g) !== null)
+        return ""
+
+    return "русская"
+}

@@ -1,4 +1,5 @@
 import logging
+import random
 import re
 from collections import defaultdict
 from datetime import date, datetime
@@ -17,6 +18,7 @@ from src.entities.quiz_tour_question_answer import QuizTourQuestionAnswer
 from src.entities.user import User
 from src.enums import QuizTourType
 from src.query_params.quiz_tours_search import QuizToursSearch
+from src.utils.name import get_first_letter, get_last_letter, get_name_length
 
 
 class QuizToursDatabase:
@@ -153,6 +155,18 @@ class QuizToursDatabase:
 
         if quiz_tour_type == QuizTourType.REGULAR:
             questions = self.__generate_regular_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
+        elif quiz_tour_type == QuizTourType.ALPHABET:
+            questions = self.__generate_alphabet_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
+        elif quiz_tour_type == QuizTourType.STAIRS:
+            questions = self.__generate_stairs_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
+        elif quiz_tour_type == QuizTourType.LETTER:
+            questions = self.__generate_letter_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
+        elif quiz_tour_type == QuizTourType.N_LETTERS:
+            questions = self.__generate_n_letters_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
+        elif quiz_tour_type == QuizTourType.MIRACLES_FIELD:
+            questions = self.__generate_miracles_field_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
+        elif quiz_tour_type == QuizTourType.CHAIN:
+            questions = self.__generate_chain_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
         else:
             raise ValueError(f'Invalid quiz tour type "{quiz_tour_type}"')
 
@@ -173,6 +187,115 @@ class QuizToursDatabase:
         return quiz_tour
 
     def __generate_regular_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
+        questions = []
+        sampled_names = []
+
+        for _ in range(count):
+            movie = self.questions_database.sample_question_movies(movies=movies, last_questions=last_questions, settings=settings, count=1)[0]
+            question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
+            questions.append(question)
+            last_questions.append(question)
+            movies = self.__exclude_similar_movies(sampled_names=sampled_names, sampled_movie=movie, movies=movies)
+
+        return questions
+
+    def __generate_alphabet_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
+        letter2position = {
+            "а": 1, "a": 1, "б": 2, "b": 2, "в": 3, "c": 3, "г": 4, "d": 4, "д": 5, "e": 5, "е": 6, "f": 6, "ё": 7, "g": 7, "ж": 8, "h": 8,
+            "з": 9, "i": 9, "и": 10, "j": 10, "й": 11, "k": 11, "к": 12, "l": 12, "л": 13, "m": 13, "м": 14, "n": 14, "н": 15, "o": 15,
+            "о": 16, "p": 16, "п": 17, "q": 17, "р": 18, "r": 18, "с": 19, "s": 19, "т": 20, "t": 20, "у": 21, "u": 21, "ф": 22, "v": 22,
+            "х": 23, "w": 23, "ц": 24, "x": 24, "ч": 25, "y": 25, "ш": 26, "z": 26, "щ": 27, "ъ": 28, "ы": 29, "ь": 30, "э": 31, "ю": 32, "я": 33,
+        }
+
+        movie_id2letter = {movie["movie_id"]: get_first_letter(movie["name"]) for movie in movies}
+        movies = [movie for movie in movies if movie_id2letter[movie["movie_id"]] in letter2position]
+
+        questions = []
+        sampled_letters = set()
+
+        for _ in range(count):
+            movie = self.questions_database.sample_question_movies(movies=movies, last_questions=last_questions, settings=settings, count=1)[0]
+            question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
+            questions.append(question)
+            last_questions.append(question)
+
+            sampled_letters.add(movie_id2letter[movie.movie_id])
+            movies = [movie for movie in movies if movie_id2letter[movie["movie_id"]] not in sampled_letters]
+
+        return sorted(questions, key=lambda question: letter2position.get(movie_id2letter[question.movie_id], 100))
+
+    def __generate_stairs_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
+        len2movies: Dict[int, list] = defaultdict(list)
+
+        for movie in movies:
+            len2movies[get_name_length(movie["name"])].append(movie)
+
+        min_length = min(len2movies)
+        start_len = random.randint(min_length, min_length + 3)
+        questions = []
+
+        for i in range(count):
+            movie = self.questions_database.sample_question_movies(movies=len2movies[start_len + i], last_questions=last_questions, settings=settings, count=1)[0]
+            question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
+            questions.append(question)
+            last_questions.append(question)
+
+        return questions
+
+    def __generate_letter_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
+        letter2movies: Dict[str, list] = defaultdict(list)
+
+        for movie in movies:
+            letter2movies[get_first_letter(movie["name"])].append(movie)
+
+        movies = random.choice([letter_movies for letter, letter_movies in letter2movies.items() if len(letter_movies) >= count * 1.2])
+        return self.__generate_tour_questions_from_movies(movies=movies, last_questions=last_questions, settings=settings, count=count)
+
+    def __generate_n_letters_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
+        len2movies: Dict[int, list] = defaultdict(list)
+
+        for movie in movies:
+            len2movies[get_name_length(movie["name"])].append(movie)
+
+        movies = random.choice([len_movies for length, len_movies in len2movies.items() if len(len_movies) >= count * 1.2])
+        return self.__generate_tour_questions_from_movies(movies=movies, last_questions=last_questions, settings=settings, count=count)
+
+    def __generate_miracles_field_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
+        movies = [movie for movie in movies if re.fullmatch(r"[a-zа-яё\d]+(\s+[a-zа-яё\d]+)?", movie["name"].lower())]
+        return self.__generate_tour_questions_from_movies(movies=movies, last_questions=last_questions, settings=settings, count=count)
+
+    def __generate_chain_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
+        letter2movies: Dict[str, list] = defaultdict(list)
+        movie_id2end_letter: Dict[int, str] = {}
+
+        for movie in movies:
+            letter2movies[get_first_letter(movie["name"])].append(movie)
+            last_letter = get_last_letter(movie["name"])
+            movie_id2end_letter[movie["movie_id"]] = self.pair_letters.get(last_letter, last_letter)
+
+        invalid_movie_ids = {movie["movie_id"] for movie in movies if len(letter2movies.get(movie_id2end_letter[movie["movie_id"]], [])) == 0}
+
+        for letter, letter_movies in letter2movies.items():
+            letter2movies[letter] = [movie for movie in letter_movies if movie["movie_id"] not in invalid_movie_ids]
+
+        letters = [letter for letter in letter2movies]
+        start_letter = random.choices(letters, weights=[len(letter2movies[letter]) for letter in letters], k=1)[0]
+
+        questions = []
+        sampled_names = []
+
+        for _ in range(count):
+            movie = self.questions_database.sample_question_movies(movies=letter2movies[start_letter], last_questions=last_questions, settings=settings, count=1)[0]
+            question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
+            questions.append(question)
+            last_questions.append(question)
+
+            start_letter = movie_id2end_letter[movie.movie_id]
+            letter2movies[start_letter] = self.__exclude_similar_movies(sampled_names=sampled_names, sampled_movie=movie, movies=letter2movies[start_letter])
+
+        return questions
+
+    def __generate_tour_questions_from_movies(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
         questions = []
         sampled_names = []
 

@@ -1,6 +1,7 @@
-function Question(sendAnswer) {
+function Question(sendAnswer, mechanics = "regular") {
     this.block = document.getElementById("question")
     this.sendAnswer = sendAnswer
+    this.mechanics = mechanics
 }
 
 Question.prototype.Build = function(question, movie, params) {
@@ -15,10 +16,46 @@ Question.prototype.Build = function(question, movie, params) {
     MakeElement("question-title", this.block, {innerHTML: this.question.title})
 
     this.BuildSpecific()
+    this.BuildMechanic()
     this.BuildShowAnswerButton()
     this.BuildAnswerBlock()
 
     this.answerTime = performance.now()
+}
+
+Question.prototype.BuildMechanic = function() {
+    if (this.mechanics === "regular")
+        return
+
+    let isFirst = this.question.title.startsWith("Вопрос 1 из")
+
+    if (this.mechanics === "alphabet" || (!isFirst && (this.mechanics == "letter" || this.mechanics == "chain"))) {
+        let block = MakeElement("question-letter", this.block)
+        let letter = this.movie.GetFirstLetter()
+        MakeElement("letter", block, {innerText: letter})
+        MakeElement("language", block, {innerText: GetLetterLanguage(letter)})
+        return
+    }
+
+    if (this.mechanics == "miracles_field") {
+        let block = MakeElement("miracles-field", this.block)
+        let topLetter = this.movie.GetMiraclesFieldLetter()
+
+        for (let letter of this.movie.name.toUpperCase()) {
+            let cell = MakeElement(letter == " " ? "space" : "", block)
+            MakeElement(letter == topLetter ? "" : "hidden", cell, {innerText: letter}, "span")
+        }
+
+        MakeElement("miracles-field-language", this.block, {innerText: GetLetterLanguage(topLetter)})
+    }
+
+    if (!isFirst && (this.mechanics === "stairs" || this.mechanics === "n_letters")) {
+        let block = MakeElement("question-letter", this.block)
+        let length = this.movie.GetNameLength()
+        MakeElement("letter", block, {innerText: length})
+        MakeElement("language", block, {innerText: GetWordForm(length, ["буква", "буквы", "букв"], true)})
+        return
+    }
 }
 
 Question.prototype.BuildSpecific = function() {
@@ -95,6 +132,10 @@ Question.prototype.ShowAnswer = function(correct = null) {
 
     for (let spoiler of document.getElementsByClassName("spoiler"))
         spoiler.classList.remove("spoiler-hidden")
+
+    for (let miraclesField of document.getElementsByClassName("miracles-field"))
+        for (let div of miraclesField.getElementsByTagName("span"))
+            div.classList.remove("hidden")
 
     this.UpdateAnswerButtons(correct)
 }

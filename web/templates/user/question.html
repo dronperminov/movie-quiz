@@ -34,7 +34,7 @@
 
         {% if question_id %}
         let questionId = {{question_id}}
-        let question = new Question(SendQuizTourAnswer)
+        let question = new Question(SendQuizTourAnswer, "{{quiz_tour_type.value}}")
         {% else %}
         let question = new Question(SendAnswer)
         {% endif %}

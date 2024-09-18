@@ -61,13 +61,14 @@ def get_quiz_tour_question(quiz_tour_id: int, user: Optional[User] = Depends(get
     content = template.render(
         user=user,
         version=get_static_hash(),
+        quiz_tour_type=quiz_tour.quiz_tour_type,
         question_id=quiz_tour_question.question_id,
         question=jsonable_encoder(question),
         questions_count=len(quiz_tour.question_ids),
         question_number=quiz_tour.question_ids.index(quiz_tour_question.question_id) + 1,
         movie=jsonable_encoder(movie),
         person_id2person=jsonable_encoder(person_id2person),
-        movie_id2scale=jsonable_encoder(movie_id2scale)
+        movie_id2scale=jsonable_encoder(movie_id2scale),
     )
     return HTMLResponse(content=content)
 

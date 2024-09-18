@@ -367,6 +367,37 @@ Movie.prototype.GetSpoileredText = function(text) {
     return spoilered.join("")
 }
 
+Movie.prototype.GetFirstLetter = function() {
+    return this.name.replace(/[^a-zа-яё\d]/gi, "")[0].toUpperCase()
+}
+
+Movie.prototype.GetNameLength = function() {
+    return this.name.toLowerCase().match(/[a-zа-яё\d]/gi).length
+}
+
+Movie.prototype.GetMiraclesFieldLetter = function() {
+    let letter2count = {}
+    let maxCount = 0
+    let maxLetter = ""
+
+    for (letter of this.name.toUpperCase()) {
+        if (!letter.match(/[a-zа-яё\d]/gi))
+            continue
+
+        if (letter in letter2count)
+            letter2count[letter] += 1
+        else
+            letter2count[letter] = 1
+
+        if (letter2count[letter] > maxCount) {
+            maxCount = letter2count[letter]
+            maxLetter = letter
+        }
+    }
+
+    return maxLetter
+}
+
 Movie.prototype.Remove = function(buttons) {
     if (!confirm(`Вы уверены, что хотите удалить ${this.movieType.ToRus()} "${this.name}"?`))
         return
