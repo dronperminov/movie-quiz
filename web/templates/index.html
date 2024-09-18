@@ -14,6 +14,60 @@
 
         <div class="slogan">Тренируйся угадывать кино, мультфильмы и сериалы и улучшай свои медийные знания!</div>
 
+        <div class="{% if not top_players %}hidden{% endif %}">
+            <h2>Топ игроков</h2>
+            <div class="description">
+                <p>Проходя мини-квизы, игроки зарабатывают себе баллы <b>рейтинга</b>. За каждый мини-квиз игрок получает очки, равные количеству процентов правильных ответов, умноженному на коэффициент, учитывающий давность тура. Очки, полученные за все пройденные квизы усредняются и идут в итоговый рейтинг. На основе набранных очков формируется топ. Для того, чтобы попасть в топ, необходимо пройти <b>более трёх</b> квизов.</p>
+                <p>В случае, если игрок не хочет, чтобы остальные видели его рейтинг, он может отключить настройку "Показывать рейтинг" в <a class="link" href="/settings">настройках</a>.</p>
+            </div>
+
+            <div class="top-players-tags" onclick="tagsInput.Clear(); ShowTopPlayers()">Теги:</div>
+            {% include "components/tags.html" %}
+
+            <div class="loader hidden" id="loader"><img src="/images/loader.svg"></div>
+
+            <div class="leaderboard" id="leaderboard">
+                {% if top_players|length >= 3 %}
+                <div class="top3-players">
+                    {% for user, rating, count in [top_players[1], top_players[0], top_players[2]] %}
+                    <div class="top3-player">
+                        <div class="top-player-name">{{user.full_name}}</div>
+                        <div class="top-player-tours-count">{{get_word_form(count, ['мини-квиз', 'мини-квиза', 'мини-квизов'])}}</div>
+                        <div class="top-player-image">
+                            <a href="/analytics?username={{user.username}}"><img src="{{user.avatar_url}}"></a>
+                            <div class="top-player-place">{{[2, 1, 3][loop.index0]}}</div>
+                        </div>
+                        <div class="top-player-flag">
+                            <div class="top-player-rating">
+                                <img src="/images/rating.svg?v={{version}}">
+                                <span>{{rating}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <div class="top-players">
+                    {% for user, rating, count in (top_players[3:15] if (top_players|length) > 3 else top_players) %}
+                    <div class="top-player">
+                        <div class="top-player-place">{{loop.index + (3 if (top_players|length) > 3 else 0)}}</div>
+                        <div class="top-player-image"><a href="/analytics?username={{user.username}}"><img src="{{user.avatar_url}}"></a></div>
+                        <div class="top-player-name">
+                            {{user.full_name}}
+                            <div class="top-player-tours-count">{{get_word_form(count, ['мини-квиз', 'мини-квиза', 'мини-квизов'])}}</div>
+                        </div>
+                        <div>
+                            <div class="top-player-rating">
+                                <img src="/images/rating.svg?v={{version}}">
+                                <span>{{rating}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
         <div class="mode">
             <div class="mode-title">ТРЕНИРОВКА</div>
             <div class="mode-description">Угадай кино, мультфильм или сериал по кадру, описанию или даже факту!</div>
@@ -29,6 +83,13 @@
 
     <script src="/js/utils/utils.js?v={{version}}"></script>
     <script src="/js/utils/fetch.js?v={{version}}"></script>
+
+    <script src="/js/inputs/multi_select.js?v={{version}}"></script>
+    <script src="/js/index.js?v={{version}}"></script>
+
+    <script>
+        let tagsInput = new MultiSelect("tags-filter", null, false, ShowTopPlayers)
+    </script>
 
     {% include "components/footer.html" %}
 </body>
