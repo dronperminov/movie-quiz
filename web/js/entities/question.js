@@ -49,6 +49,10 @@ Question.prototype.BuildSpecific = function() {
             MakeElement("link", block, {href: `/persons/${person.person_id}`, innerText: person.name}, "a")
         }
     }
+    else if (this.questionType == "movie_by_characters") {
+        let characters = this.question.characters.map(character => `<li>${character}</li>`).join("")
+        MakeElement("question-text", this.block, {innerHTML: `<ul>${characters}</ul>`})
+    }
 }
 
 Question.prototype.BuildShowAnswerButton = function() {

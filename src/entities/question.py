@@ -1,3 +1,4 @@
+import random
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Optional, Set, Tuple
@@ -54,6 +55,8 @@ class Question:
         elif question_type == QuestionType.MOVIE_BY_ACTORS:
             actors = [Person.from_dict(actor) for actor in data["actors"]]
             question = MovieByActorsQuestion(title=data["title"], answer=data["answer"], actors=actors, hide_actor_photos=data["hide_actor_photos"])
+        elif question_type == QuestionType.MOVIE_BY_CHARACTERS:
+            question = MovieByCharactersQuestion(title=data["title"], answer=data["answer"], characters=data["characters"])
         else:
             raise ValueError(f'Invalid question_type "{question_type}"')
 
@@ -181,3 +184,24 @@ class MovieByActorsQuestion(Question):
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), "actors": [actor.to_dict() for actor in self.actors], "hide_actor_photos": self.hide_actor_photos}
+
+
+@dataclass
+class MovieByCharactersQuestion(Question):
+    characters: List[str]
+
+    @classmethod
+    def generate(cls: Self, movie: Movie, username: str) -> Self:
+        characters = [actor.description for actor in movie.actors[:random.randint(3, 5)]]
+        question = cls(title=movie.get_question_title(" по именам персонажей"), answer=movie.get_question_answer(), characters=characters)
+        question.init_base(question_type=QuestionType.MOVIE_BY_CHARACTERS, username=username, movie_id=movie.movie_id)
+        return question
+
+    def update(self, movie: Movie, person_id2person: Dict[int, Person], settings: QuestionSettings) -> Self:
+        super().update(movie, person_id2person, settings)
+        self.title = movie.get_question_title(" по именам персонажей")
+        self.answer = movie.get_question_answer()
+        return self
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "characters": self.characters}

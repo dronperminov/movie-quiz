@@ -116,6 +116,9 @@ Movie.prototype.BuildPagePersons = function(parent, header, persons) {
         let link = MakeElement("", actorBlock, {href: `/persons/${actor.person_id}`}, "a")
         MakeElement("", link, {src: person.photo_url, loading: "lazy"}, "img")
         MakeElement("link", actorBlock, {href: `/persons/${actor.person_id}`, innerText: person.name}, "a")
+
+        if (actor.description.length > 0)
+            MakeElement("", actorBlock, {innerText: actor.description})
     }
 }
 
@@ -228,6 +231,7 @@ Movie.prototype.BuildInfoActors = function(parent) {
         let link = MakeElement("", infoImage, {href: `/persons/${actor.person_id}`}, "a")
         MakeElement("", link, {src: person.photo_url, loading: "lazy"}, "img")
         MakeElement("link", infoImage, {href: `/persons/${actor.person_id}`, innerText: person.name}, "a")
+        MakeElement("", infoImage, {innerText: actor.description})
     }
 }
 

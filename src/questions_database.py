@@ -7,7 +7,7 @@ import numpy as np
 
 from src.database import Database
 from src.entities.movie import Movie
-from src.entities.question import MovieByActorsQuestion, MovieByDescriptionQuestion, MovieByImageQuestion, MovieBySloganQuestion, Question
+from src.entities.question import MovieByActorsQuestion, MovieByCharactersQuestion, MovieByDescriptionQuestion, MovieByImageQuestion, MovieBySloganQuestion, Question
 from src.entities.question_answer import QuestionAnswer
 from src.entities.question_settings import QuestionSettings
 from src.entities.settings import Settings
@@ -154,6 +154,9 @@ class QuestionsDatabase:
 
         if question_type == QuestionType.MOVIE_BY_ACTORS:
             return MovieByActorsQuestion.generate(movie=movie, username=username, person_id2person=person_id2person, hide_actor_photos=settings.hide_actor_photos)
+
+        if question_type == QuestionType.MOVIE_BY_CHARACTERS:
+            return MovieByCharactersQuestion.generate(movie=movie, username=username)
 
         raise ValueError("Invalid question type")
 

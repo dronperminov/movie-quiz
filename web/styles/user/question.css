@@ -12,6 +12,10 @@
     margin-bottom: 0.5em;
 }
 
+.question-text li {
+    line-height: 1.5em
+}
+
 .question-image {
     text-align: center;
 }
