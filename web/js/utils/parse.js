@@ -15,7 +15,7 @@ function ParseMovies(buttons, movieIds, maxImages = 50) {
         }
 
         let text = GetWordForm(response.movies, ["фильм успешно распаршен", "фильма успешно распаршены", "фильмов успешно распаршены"])
-        ShowNotification(`${text} (новые фильмы: ${response.new_movies}, новые персоны: ${response.new_persons}).`, "success-notification")
+        ShowNotification(`${text} (новые фильмы: ${response.new_movies}, новые персоны: ${response.new_persons}, удалённые персоны: ${response.removed_persons}).`, "success-notification")
     })
 }
 

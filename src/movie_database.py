@@ -202,6 +202,20 @@ class MovieDatabase:
         self.database.history.insert_one(action.to_dict())
         self.logger.info(f'Removed person "{person["name"]}" ({person_id}) by @{username}')
 
+    def remove_empty_persons(self, username: str) -> int:
+        person_ids = set()
+
+        for movie in self.database.movies.find({}, {"actors": 1, "directors": 1}):
+            for person in movie["actors"] + movie["directors"]:
+                person_ids.add(person["person_id"])
+
+        removed_persons = 0
+        for person in self.database.persons.find({"person_id": {"$nin": list(person_ids)}}, {"person_id": 1}):
+            self.remove_person(person_id=person["person_id"], username=username)
+            removed_persons += 1
+
+        return removed_persons
+
     def add_from_kinopoisk(self, movies: List[dict], username: str) -> Tuple[int, int]:
         movies_count = self.get_movies_count()
         persons_count = self.get_persons_count()

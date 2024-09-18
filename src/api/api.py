@@ -38,7 +38,8 @@ def parse_movies(params: MovieParse, user: Optional[User] = Depends(get_user)) -
     try:
         movies = kinopoisk_parser.parse_movies(movie_ids=params.movie_ids, max_images=params.max_images)
         new_movies, new_persons = movie_database.add_from_kinopoisk(movies=movies, username=user.username)
-        return JSONResponse({"status": "success", "movies": len(movies), "new_movies": new_movies, "new_persons": new_persons})
+        removed_persons = movie_database.remove_empty_persons(username="dronperminov")
+        return JSONResponse({"status": "success", "movies": len(movies), "new_movies": new_movies, "new_persons": new_persons, "removed_persons": removed_persons})
     except Exception as error:
         return JSONResponse({"status": "error", "message": str(error)})
 

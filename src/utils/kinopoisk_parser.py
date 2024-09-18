@@ -80,11 +80,15 @@ class KinopoiskParser:
             if person["enProfession"] != profession or not person["name"]:
                 continue
 
+            description = person["description"] if person["description"] else ""
+            if description in ["дополнительные голоса", "озвучка"]:
+                continue
+
             filtered.append({
                 "kinopoisk_id": person["id"],
                 "name": person["name"],
                 "photo_url": self.__fix_url(person["photo"]),
-                "description": person["description"] if person["description"] else ""
+                "description": description
             })
 
         return filtered
