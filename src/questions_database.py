@@ -11,6 +11,7 @@ from src.entities.question import MovieByActorsQuestion, MovieByDescriptionQuest
 from src.entities.question_answer import QuestionAnswer
 from src.entities.question_settings import QuestionSettings
 from src.entities.settings import Settings
+from src.entities.user import User
 from src.enums import QuestionType
 from src.movie_database import MovieDatabase
 
@@ -105,6 +106,26 @@ class QuestionsDatabase:
 
     def get_question_movies(self, settings: QuestionSettings) -> List[dict]:
         return list(self.database.movies.find(settings.to_query(), {"movie_id": 1, "movie_type": 1, "production": 1, "year": 1}))
+
+    def get_movies_scales(self, user: Optional[User], movies: List[Movie]) -> Dict[int, dict]:
+        if not user:
+            return {}
+
+        settings = self.database.get_settings(username=user.username)
+        if not settings.show_knowledge_status:
+            return {}
+
+        movie_ids = list({movie.movie_id for movie in movies})
+        questions = list(self.database.questions.find({"username": user.username, "correct": {"$ne": None}, "movie_id": {"$in": movie_ids}}))
+        movie_id2scale = {question["movie_id"]: {"incorrect": 0, "correct": 0, "scale": 0} for question in questions}
+
+        for question in questions:
+            movie_id2scale[question["movie_id"]]["correct" if question["correct"] else "incorrect"] += 1
+
+        for movie_id, scales in movie_id2scale.items():
+            movie_id2scale[movie_id]["scale"] = scales["correct"] / (scales["correct"] + scales["incorrect"])
+
+        return movie_id2scale
 
     def update_question(self, question: Question, settings: QuestionSettings) -> Question:
         movie = self.movie_database.get_movie(movie_id=question.movie_id)

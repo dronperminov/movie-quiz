@@ -5,6 +5,6 @@ function GetQuestion() {
             return
         }
 
-        question.Build(response.question, response.movie, {personId2person: response.person_id2person})
+        question.Build(response.question, response.movie, {personId2person: response.person_id2person, movieId2scale: response.movie_id2scale})
     })
 }

@@ -35,6 +35,7 @@ Movie.prototype.Build = function() {
     let movieInfo = MakeElement("movie-data", movie)
 
     let movieName = MakeElement("movie-name", movieInfo)
+    this.BuildScale(movieName)
     MakeElement("", movieName, {href: `/movies/${this.movieId}`, innerText: this.name}, "a")
 
     MakeElement("movie-stats", movieInfo, {innerHTML: this.GetStats()})
@@ -175,15 +176,26 @@ Movie.prototype.BuildInfo = function() {
     return info
 }
 
+Movie.prototype.BuildScale = function(parent) {
+    if (!this.params.movieId2scale || !(this.movieId in this.params.movieId2scale))
+        return
+
+    let scale = this.params.movieId2scale[this.movieId]
+    let circle = MakeElement("circle", parent, {style: `background-color: hsl(${scale.scale * 120}, 70%, 50%)`})
+    let correct = GetWordForm(scale.correct, ['корректный', 'корректных', 'корректных'])
+    let incorrect = GetWordForm(scale.incorrect, ['некорректный', 'некорректных', 'некорректных'])
+    circle.addEventListener("click", () => ShowNotification(`<b>${this.name}</b>: ${correct} и ${incorrect}`, 'info-notification', 3000))
+}
+
 Movie.prototype.BuildName = function(parent, className) {
+    let header = MakeElement(className, parent)
+
+    this.BuildScale(header)
+    let span = MakeElement("", header, {innerText: `${this.name} `}, "span")
+
     if (this.source.name == "kinopoisk") {
-        let header = MakeElement(className, parent)
         let link = MakeElement("", header, {href: `https://kinopoisk.ru/film/${this.source.kinopoisk_id}`, target: "_blank"}, "a")
-        let img = MakeElement("", link, {src: "/images/kinopoisk.svg"}, "img")
-        let span = MakeElement("", header, {innerText: ` ${this.name}`}, "span")
-    }
-    else {
-        MakeElement(className, parent, {innerHTML: this.name})
+        MakeElement("", link, {src: "/images/kinopoisk.svg"}, "img")
     }
 }
 

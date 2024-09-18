@@ -26,7 +26,7 @@
 
     <script>
         let infos = new InfoPanels()
-        let movie = new Movie({{jsonable_encoder(movie)|tojson}}, {personId2person: {{jsonable_encoder(person_id2person)|tojson}}})
+        let movie = new Movie({{movie|tojson}}, {personId2person: {{person_id2person|tojson}}, movieId2scale: {{movie_id2scale|tojson}}})
         movie.BuildPage()
     </script>
     {% include "components/footer.html" %}

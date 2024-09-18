@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from src import movie_database
+from src import movie_database, questions_database
 from src.api import send_error, templates
 from src.entities.user import User
 from src.query_params.person_movies import PersonMovies
@@ -31,13 +31,15 @@ def get_person(person_id: int, user: Optional[User] = Depends(get_user)) -> HTML
 
 
 @router.post("/person-movies")
-def get_person_movies(params: PersonMovies) -> JSONResponse:
+def get_person_movies(params: PersonMovies, user: Optional[User] = Depends(get_user)) -> JSONResponse:
     total, movies = movie_database.get_person_movies(params=params)
     person_id2person = movie_database.get_movies_persons(movies=movies)
+    movie_id2scale = questions_database.get_movies_scales(user=user, movies=movies)
 
     return JSONResponse({
         "status": "success",
         "total": total,
         "movies": jsonable_encoder(movies),
-        "person_id2person": jsonable_encoder(person_id2person)
+        "person_id2person": jsonable_encoder(person_id2person),
+        "movie_id2scale": jsonable_encoder(movie_id2scale)
     })

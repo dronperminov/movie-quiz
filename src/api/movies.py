@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from src import database, movie_database
+from src import database, movie_database, questions_database
 from src.api import send_error, templates
 from src.entities.user import User
 from src.enums import MovieType, Production, UserRole
@@ -42,15 +42,17 @@ def get_movies(user: Optional[User] = Depends(get_user), params: MovieSearchQuer
 
 
 @router.post("/movies")
-def search_movies(params: MovieSearch) -> JSONResponse:
+def search_movies(params: MovieSearch, user: Optional[User] = Depends(get_user)) -> JSONResponse:
     total, movies = movie_database.search_movies(params=params)
     person_id2person = movie_database.get_movies_persons(movies=movies)
+    movie_id2scale = questions_database.get_movies_scales(user=user, movies=movies)
 
     return JSONResponse({
         "status": "success",
         "total": total,
         "movies": jsonable_encoder(movies),
-        "person_id2person": jsonable_encoder(person_id2person)
+        "person_id2person": jsonable_encoder(person_id2person),
+        "movie_id2scale": jsonable_encoder(movie_id2scale)
     })
 
 
@@ -62,15 +64,15 @@ def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLRe
         return send_error(title="Фильм не найден", text="Не удалось найти запрашиваемый фильм. Возможно, он был удалён", user=user)
 
     person_id2person = movie_database.get_movies_persons(movies=[movie])
+    movie_id2scale = questions_database.get_movies_scales(user=user, movies=[movie])
 
     template = templates.get_template("movies/movie.html")
     content = template.render(
         user=user,
         version=get_static_hash(),
-        movie=movie,
-        person_id2person=person_id2person,
-        jsonable_encoder=jsonable_encoder,
-        get_word_form=get_word_form
+        movie=jsonable_encoder(movie),
+        person_id2person=jsonable_encoder(person_id2person),
+        movie_id2scale=jsonable_encoder(movie_id2scale)
     )
     return HTMLResponse(content=content)
 

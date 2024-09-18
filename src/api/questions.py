@@ -27,6 +27,7 @@ def get_question(user: Optional[User] = Depends(get_user)) -> Response:
 
     movie = movie_database.get_movie(movie_id=question.movie_id)
     person_id2person = movie_database.get_movies_persons(movies=[movie])
+    movie_id2scale = questions_database.get_movies_scales(user=user, movies=[movie])
 
     template = templates.get_template("user/question.html")
     content = template.render(
@@ -34,7 +35,8 @@ def get_question(user: Optional[User] = Depends(get_user)) -> Response:
         version=get_static_hash(),
         question=jsonable_encoder(question),
         movie=jsonable_encoder(movie),
-        person_id2person=jsonable_encoder(person_id2person)
+        person_id2person=jsonable_encoder(person_id2person),
+        movie_id2scale=jsonable_encoder(movie_id2scale)
     )
     return HTMLResponse(content=content)
 
@@ -49,11 +51,14 @@ def post_question(user: Optional[User] = Depends(get_user)) -> JSONResponse:
 
     movie = movie_database.get_movie(movie_id=question.movie_id)
     person_id2person = movie_database.get_movies_persons(movies=[movie])
+    movie_id2scale = questions_database.get_movies_scales(user=user, movies=[movie])
+
     return JSONResponse({
         "status": "success",
         "question": jsonable_encoder(question),
         "movie": jsonable_encoder(movie),
-        "person_id2person": jsonable_encoder(person_id2person)
+        "person_id2person": jsonable_encoder(person_id2person),
+        "movie_id2scale": jsonable_encoder(movie_id2scale)
     })
 
 

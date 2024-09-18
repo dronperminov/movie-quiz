@@ -33,7 +33,7 @@
         let infos = new InfoPanels()
 
         let question = new Question("/answer-question", GetQuestion)
-        question.Build({{question|tojson}}, {{movie|tojson}}, {personId2person: {{person_id2person|tojson}}})
+        question.Build({{question|tojson}}, {{movie|tojson}}, {personId2person: {{person_id2person|tojson}}, movieId2scale: {{movie_id2scale|tojson}}})
     </script>
     {% include "components/footer.html" %}
 </body>
