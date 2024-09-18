@@ -71,7 +71,8 @@ QuizTour.prototype.QuizTourTypeToRus = function() {
 
 QuizTour.prototype.TagToRus = function(tag) {
     let tag2rus = {
-        "top": "топовые",
+        "top": "топовое",
+        "soviet": "советское",
         "cartoon": "мультфильмы",
         "series": "сериалы",
         "movie": "фильмы",
