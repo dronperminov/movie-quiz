@@ -1,0 +1,113 @@
+{% set title = "Мини-квизы | КМС квиз Плюшевой наковальни" %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/utils/search.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/quiz_tours/quiz_tours.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <h1>Мини-квизы</h1>
+
+        <div class="search search-query-empty" id="search">
+            <div class="search-main">
+                <div class="search-clear">
+                    <div class="search-clear-icon"></div>
+                </div>
+                <div class="search-query">
+                    <input class="basic-input" type="search" id="query" placeholder="введите запрос">
+                </div>
+                <div class="search-filters" title="Фильтры">
+                    <svg width="1.5em" height="1.5em" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M15 10.5A3.502 3.502 0 0 0 18.355 8H21a1 1 0 1 0 0-2h-2.645a3.502 3.502 0 0 0-6.71 0H3a1 1 0 0 0 0 2h8.645A3.502 3.502 0 0 0 15 10.5zM3 16a1 1 0 1 0 0 2h2.145a3.502 3.502 0 0 0 6.71 0H21a1 1 0 1 0 0-2h-9.145a3.502 3.502 0 0 0-6.71 0H3z"/>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="search-filters-popup" id="search-filters-popup">
+                <div class="close-icon" onclick="search.CloseFiltersPopup()"></div>
+
+                <h3>Фильтры</h3>
+
+                <div class="search-filter">
+                    <label>Искать среди
+                        <select class="basic-select" id="completed-type">
+                            <option value="all">всех мини-квизов</option>
+                            {% if user %}
+                            <option value="completed">пройденных</option>
+                            <option value="started">начатых</option>
+                            <option value="unstarted">не начатых</option>
+                            {% endif %}
+                        </select>
+                    </label>
+                </div>
+
+                <div class="search-filter-line"></div>
+
+                <div class="search-filter">
+                    <label onclick="quizTourTypeInput.Clear()">Механики</label>
+                    <div class="multi-select" id="quiz-tour-type-filter">
+                        {% for quiz_tour_type in QuizTourType %}<div class="multi-select-option" data-name="{{quiz_tour_type.value}}">{{quiz_tour_type.to_rus()}}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="search-filter-line"></div>
+
+                <div class="search-filter">
+                    <label onclick="tagsInput.Clear()">Теги</label>
+                    {% include "components/tags.html" %}
+                </div>
+
+                <div class="search-filter-line"></div>
+
+                <div class="search-filter-button">
+                    <button class="basic-button gradient-button" onclick="search.Search()">Искать</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-tours">
+            <div class="search-results"></div>
+            <div class="quiz-tours"></div>
+            <div class="loader hidden"><img src="/images/loader.svg"></div>
+        </div>
+    </div>
+
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+    <script src="/js/utils/swipe_handler.js?v={{version}}"></script>
+    <script src="/js/utils/infinite_scroll.js?v={{version}}"></script>
+    <script src="/js/utils/search.js?v={{version}}"></script>
+
+    <script src="/js/inputs/multi_select.js?v={{version}}"></script>
+
+    <script src="/js/entities/quiz_tour.js?v={{version}}"></script>
+
+    <script src="/js/quiz_tours/quiz_tours.js?v={{version}}"></script>
+
+    <script>
+        let config = {
+            pageSize: 10,
+            url: "/quiz-tours",
+
+            getParams: GetSearchParams,
+            onLoad: LoadQuizTours
+        }
+
+        let search = new Search("search", SearchQuizTours, ClearQuizTours)
+
+        let quizTourTypeInput = new MultiSelect("quiz-tour-type-filter"{% if search_params %}, {{search_params.quiz_tour_types|tojson}}{% endif %})
+        let tagsInput = new MultiSelect("tags-filter"{% if search_params %}, {{search_params.tags|tojson}}{% endif %})
+
+        {% if search_params %}
+        document.getElementById("query").value = {{search_params.query|tojson}}
+        document.getElementById("completed-type").value = {{search_params.completed_type|tojson}}
+        {% endif %}
+
+        let infiniteScroll = new InfiniteScroll("quiz-tours", config)
+        infiniteScroll.LoadContent()
+    </script>
+
+    {% include "components/footer.html" %}
+</body>
+</html>

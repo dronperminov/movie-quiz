@@ -85,16 +85,16 @@ class QuestionsDatabase:
 
         feature2balance = {
             "movie_type": {movie_type.value: value for movie_type, value in settings.movie_types.items()},
-            "production": {production.value: value for production, value in settings.production.items()},
-            "year": {years: value for years, value in settings.years.items()}
+            "production_key": {production.value: value for production, value in settings.production.items()},
+            "year_key": {years: value for years, value in settings.years.items()}
         }
 
         year2key = settings.get_possible_years()
         features2count = defaultdict(int)
 
         for movie in movies:
-            movie["year"] = year2key[movie["year"]]
-            movie["production"] = movie["production"][0]
+            movie["year_key"] = year2key[movie["year"]]
+            movie["production_key"] = movie["production"][0]
             features2count[tuple(movie[feature] for feature in feature2balance)] += 1
 
         movie_weights = [self.__get_movie_weight(movie, feature2balance, features2count, movie_id2weight) for movie in movies]

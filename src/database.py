@@ -1,5 +1,5 @@
 import re
-from typing import Optional
+from typing import List, Optional
 
 from pymongo import ASCENDING, MongoClient
 
@@ -20,6 +20,9 @@ class Database:
     persons = None
     cites = None
     history = None
+    quiz_tours = None
+    quiz_tour_questions = None
+    quiz_tour_answers = None
 
     def __init__(self, mongo_url: str, database_name: str) -> None:
         self.mongo_url = mongo_url
@@ -31,7 +34,7 @@ class Database:
 
         self.identifiers = database["identifiers"]
 
-        for name in ["movies", "cites", "tracks", "persons"]:
+        for name in ["movies", "cites", "tracks", "persons", "quiz_tours", "quiz_tour_questions"]:
             if self.identifiers.find_one({"_id": name}) is None:
                 self.identifiers.insert_one({"_id": name, "value": 0})
 
@@ -65,6 +68,16 @@ class Database:
         self.history.create_index([("username", ASCENDING)])
         self.history.create_index([("timestamp", ASCENDING)])
 
+        self.quiz_tours = database["quiz_tours"]
+        self.quiz_tours.create_index(([("quiz_tour_id", ASCENDING)]), unique=True)
+
+        self.quiz_tour_questions = database["quiz_tour_questions"]
+        self.quiz_tour_questions.create_index(([("question_id", ASCENDING)]), unique=True)
+
+        self.quiz_tour_answers = database["quiz_tour_answers"]
+        self.quiz_tour_answers.create_index(([("username", ASCENDING)]))
+        self.quiz_tour_answers.create_index(([("correct", ASCENDING)]))
+
     def get_user(self, username: str) -> Optional[User]:
         if not username:
             return None
@@ -75,6 +88,11 @@ class Database:
 
         role = self.roles.find_one({"username": user["username"]})
         return User.from_quiz_dict(user, UserRole(role["role"]) if role else UserRole.USER)
+
+    def get_users(self, usernames: List[str]) -> List[User]:
+        users = self.users.find({"username": {"$in": usernames}})
+        username2role = {role["username"]: UserRole(role["role"]) for role in self.roles.find({"username": {"$in": usernames}})}
+        return [User.from_quiz_dict(user, username2role.get(user["username"], UserRole.USER)) for user in users]
 
     def get_identifier(self, collection_name: str) -> int:
         identifier = self.identifiers.find_one_and_update({"_id": collection_name}, {"$inc": {"value": 1}}, return_document=True)

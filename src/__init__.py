@@ -6,6 +6,7 @@ import sys
 from src.database import Database
 from src.movie_database import MovieDatabase
 from src.questions_database import QuestionsDatabase
+from src.quiz_tours_database import QuizToursDatabase
 from src.utils.kinopoisk_parser import KinopoiskParser
 
 
@@ -24,3 +25,4 @@ else:
 database = Database(mongo_url="mongodb://localhost:27017/", database_name="movie_quiz_db")
 movie_database = MovieDatabase(database=database, kinopoisk_parser=kinopoisk_parser, logger=logger)
 questions_database = QuestionsDatabase(database=database, movie_database=movie_database, logger=logger)
+quiz_tours_database = QuizToursDatabase(database=database, questions_database=questions_database, logger=logger)
