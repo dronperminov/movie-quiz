@@ -25,8 +25,15 @@ function GetSearchParams() {
 
 function LoadMovies(response, block) {
     for (let movie of response.movies) {
-        movie = new Movie(movie, {personId2person: response.person_id2person, movieId2scale: response.movie_id2scale})
-        block.appendChild(movie.Build(response.movie_id2scale))
+        let params = {
+            personId2person: response.person_id2person,
+            movieId2scale: response.movie_id2scale,
+            movieId2correct: response.movie_id2correct ? response.movie_id2correct : null,
+            movieId2status: response.movie_id2status ? response.movie_id2status : null
+        }
+
+        movie = new Movie(movie, params)
+        block.appendChild(movie.Build())
         infos.Add(movie.BuildInfo())
     }
 

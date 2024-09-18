@@ -1,0 +1,52 @@
+.quiz-tour-image:hover img {
+    padding: 1px;
+    border: none;
+}
+
+.quiz-tour-name {
+    font-weight: bold;
+    font-size: 1.8em;
+    text-align: center;
+    margin-bottom: 0.5em;
+}
+
+.quiz-tour-description {
+    font-size: 1.1em;
+    color: var(--text-color);
+    margin-bottom: 0.5em;
+}
+
+.quiz-tour-analytics {
+    font-size: 1.1em;
+    color: var(--text-color);
+    margin: 0 0 0.5em 0;
+    text-align: left;
+}
+
+.quiz-tour-type {
+    font-size: 1.1em;
+}
+
+.quiz-tour-tags {
+    text-align: left;
+    color: var(--text-color);
+    margin-bottom: 0.8em;
+}
+
+.quiz-tour-tracks {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 1em;
+    max-height: 22em;
+    overflow-y: auto;
+}
+
+.back-link {
+    margin-bottom: 1.5em;
+}
+
+.question-status {
+    text-align: right;
+    font-size: 0.75em;
+    margin-top: 0.7em;
+}

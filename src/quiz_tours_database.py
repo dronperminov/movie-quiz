@@ -1,9 +1,13 @@
 import logging
+import re
 from collections import defaultdict
 from datetime import date, datetime
 from typing import Dict, List, Optional, Tuple
 
+from rapidfuzz import fuzz
+
 from src import Database, QuestionsDatabase
+from src.entities.movie import Movie
 from src.entities.question import Question
 from src.entities.question_settings import QuestionSettings
 from src.entities.quiz_tour import QuizTour
@@ -111,6 +115,7 @@ class QuizToursDatabase:
 
         question = QuizTourQuestion.from_dict(self.database.quiz_tour_questions.find_one({"question_id": quiz_tour.question_ids[len(answers)]}))
         question.question = self.questions_database.update_question(question.question, QuestionSettings.default())
+        question.question.title = f"Вопрос {quiz_tour.question_ids.index(question.question_id) + 1} из {len(quiz_tour.question_ids)}. {question.question.title}"
         return question
 
     def have_question(self, question_id: int, username: str) -> bool:
@@ -169,14 +174,34 @@ class QuizToursDatabase:
 
     def __generate_regular_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
         questions = []
+        sampled_names = []
 
         for _ in range(count):
             movie = self.questions_database.sample_question_movies(movies=movies, last_questions=last_questions, settings=settings, count=1)[0]
             question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
             questions.append(question)
             last_questions.append(question)
+            movies = self.__exclude_similar_movies(sampled_names=sampled_names, sampled_movie=movie, movies=movies)
 
         return questions
+
+    def __exclude_similar_movies(self, sampled_names: List[str], sampled_movie: Movie, movies: List[dict]) -> List[dict]:
+        sampled_names.append(self.__preprocess_name(sampled_movie.name))
+        return [movie for movie in movies if not self.__is_similar_movie(movie["name"], sampled_names)]
+
+    def __preprocess_name(self, name: str) -> str:
+        return re.sub(r"\W+", " ", name)
+
+    def __is_similar_movie(self, name: str, names: List[str]) -> bool:
+        name_words = self.__preprocess_name(name).split(" ")
+
+        for sampled_name in names:
+            words = sampled_name.split(" ")
+            length = min(3, max(len(name_words), len(words)))
+            if fuzz.partial_ratio(" ".join(name_words[:length]), " ".join(words[:length])) > 80:
+                return True
+
+        return False
 
     def __get_last_questions(self, movie_ids: List[int]) -> List[Question]:
         last_questions = self.database.quiz_tour_questions.find({"question.movie_id": {"$in": movie_ids}}).sort("question_id", -1).limit(self.last_questions_count)

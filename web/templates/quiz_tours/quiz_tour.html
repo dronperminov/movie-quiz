@@ -1,0 +1,115 @@
+{% set title = "%s | Музыкальный квиз Плюшевой наковальни" % quiz_tour.name %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/utils/info_panels.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/utils/history.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/user/analytics.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/movies/movies.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/quiz_tours/quiz_tours.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/quiz_tours/quiz_tour.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <div id="quiz-tour"></div>
+
+        <div class="back-link"><button class="basic-button gradient-button" onclick="location.href='/quiz-tours'">Вернуться к списку мини-квизов</button></div>
+
+        <h2>Аналитика</h2>
+
+        {% set status = statuses[quiz_tour.quiz_tour_id] %}
+        <div class="analytics-block">
+            <div onclick="ToggleTotalTimeChart()">
+                <div class="analytics-total-value">{{format_time(status.time.total)}}</div>
+                <div class="analytics-description">Суммарное время, потребовавшееся на прохождение квиза (нажмите, чтобы увидеть подробности)</div>
+                <div class="analytics-bar analytics-bar-small" id="total-time-small-bar">
+                    {% if status.time.correct > 0 %}<div class="correct-background" style="width: {{status.time.correct / status.time.total * 100}}%"></div>{% endif %}
+                    {% if status.time.incorrect > 0 %}<div class="incorrect-background" style="width: {{status.time.incorrect / status.time.total * 100}}%"></div>{% endif %}
+                </div>
+            </div>
+
+            <div class="analytics-chart" id="total-time-block">
+                <div class="analytics-list">
+                    {% if status.time.correct > 0 %}
+                    <div class="analytics-time-label"><span class="circle correct-background"></span> Верно</div>
+                    <div class="analytics-time">{{format_time(status.time.correct)}}</div>
+                    {% endif %}
+
+                    {% if status.time.incorrect > 0 %}
+                    <div class="analytics-time-label"><span class="circle incorrect-background"></span> Неверно</div>
+                    <div class="analytics-time">{{format_time(status.time.incorrect)}}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-block" id="questions-block">
+            <div class="analytics-title analytics-title-interactive" onclick="ToggleQuestionsChart()">Ответы</div>
+            <div class="analytics-description">Нажмите на показатель, чтобы увидеть диаграмму.</div>
+            <div class="analytics-items">
+                <div class="analytics-item analytics-item-interactive" onclick="ShowQuestionsChart()">
+                    <div class="analytics-item-value">{{status.total}}</div>
+                    <div class="analytics-item-name"><b>всего</b></div>
+                </div>
+
+                <div class="analytics-item analytics-item-interactive" onclick="ShowQuestionsChart()">
+                    <div class="analytics-item-value">{{status.correct_percents|round(1)}}%</div>
+                    <div class="analytics-item-name"><span class="circle correct-background"></span><b>верно</b>: {{status.correct}}</div>
+                </div>
+
+                <div class="analytics-item analytics-item-interactive" onclick="ShowQuestionsChart()">
+                    <div class="analytics-item-value">{{status.incorrect_percents|round(1)}}%</div>
+                    <div class="analytics-item-name"><span class="circle incorrect-background"></span><b>неверно</b>: {{status.incorrect}}</div>
+                </div>
+            </div>
+            <div class="analytics-chart" id="questions-chart-block">
+                <svg id="questions-chart"></svg>
+            </div>
+        </div>
+
+        <h2>Загаданные фильмы</h2>
+        <div id="movies"></div>
+    </div>
+
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+    <script src="/js/utils/swipe_handler.js?v={{version}}"></script>
+    <script src="/js/utils/info_panels.js?v={{version}}"></script>
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/utils/history.js?v={{version}}"></script>
+
+    <script src="/js/charts/chart.js?v={{version}}"></script>
+
+    <script src="/js/entities/movie_type.js?v={{version}}"></script>
+    <script src="/js/entities/genre.js?v={{version}}"></script>
+    <script src="/js/entities/production.js?v={{version}}"></script>
+    <script src="/js/entities/metadata.js?v={{version}}"></script>
+    <script src="/js/entities/movie.js?v={{version}}"></script>
+    <script src="/js/entities/quiz_tour.js?v={{version}}"></script>
+
+    <script src="/js/movies/movies.js?v={{version}}"></script>
+    <script src="/js/user/analytics.js?v={{version}}"></script>
+    <script>
+        let infos = new InfoPanels()
+
+        const questionsData = [
+            {value: {{status.correct}}, color: key2color.correct},
+            {value: {{status.incorrect}}, color: key2color.incorrect},
+        ]
+
+        let quizTour = new QuizTour({{quiz_tour|tojson}}, {{statuses|tojson}})
+        quizTour.BuildPage("quiz-tour")
+
+        let movies = document.getElementById("movies")
+        let response = {
+            movies: {{movies|tojson}},
+            person_id2person: {{person_id2person|tojson}},
+            movie_id2scale: {{movie_id2scale|tojson}},
+            movie_id2correct: {{movie_id2correct|tojson}},
+            movie_id2status: {{movie_id2status|tojson}},
+        }
+
+        LoadMovies(response, movies)
+    </script>
+    {% include "components/footer.html" %}
+</body>
+</html>

@@ -36,3 +36,18 @@ def get_word_form(count: int, word_forms: List[str], only_form: bool = False) ->
         index = 1
 
     return word_forms[index] if only_form else f"{count} {word_forms[index]}"
+
+
+def format_time(total: float) -> str:
+    if total < 60:
+        return f"{round(total, 1)} сек."
+
+    seconds = round(total)
+    minutes = (seconds // 60) % 60
+    hours = seconds // 3600
+    seconds = seconds % 60
+
+    if total < 3600:
+        return f"{minutes:02} мин. {seconds:02} сек."
+
+    return f"{hours} ч. {minutes:02} мин."

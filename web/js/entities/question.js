@@ -1,7 +1,6 @@
-function Question(answerUrl, onAnswer) {
+function Question(sendAnswer) {
     this.block = document.getElementById("question")
-    this.answerUrl = answerUrl
-    this.onAnswer = onAnswer
+    this.sendAnswer = sendAnswer
 }
 
 Question.prototype.Build = function(question, movie, params) {
@@ -25,7 +24,7 @@ Question.prototype.Build = function(question, movie, params) {
 Question.prototype.BuildSpecific = function() {
     if (this.questionType == "movie_by_image") {
         let image = MakeElement("question-image", this.block)
-        MakeElement("", image, {src: this.question.image_url}, "img")
+        MakeElement("", image, {src: "https://movie-quiz.plush-anvil.ru" + this.question.image_url}, "img")
     }
     else if (this.questionType == "movie_by_slogan") {
         MakeElement("question-text", this.block, {innerText: this.question.slogan})
@@ -125,16 +124,5 @@ Question.prototype.SendAnswer = function(correct) {
     for (let button of buttons)
         button.setAttribute("disabled", "")
 
-    SendRequest(this.answerUrl, {correct: correct, answer_time: this.answerTime}).then(response => {
-        if (response.status != SUCCESS_STATUS) {
-            ShowNotification(response.message, "error-notification")
-
-            for (let button of buttons)
-                button.removeAttribute("disabled")
-
-            return
-        }
-
-        this.onAnswer()
-    })
+    this.sendAnswer(correct, this.answerTime, buttons)
 }

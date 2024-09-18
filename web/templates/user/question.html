@@ -32,8 +32,19 @@
     <script>
         let infos = new InfoPanels()
 
-        let question = new Question("/answer-question", GetQuestion)
-        question.Build({{question|tojson}}, {{movie|tojson}}, {personId2person: {{person_id2person|tojson}}, movieId2scale: {{movie_id2scale|tojson}}})
+        {% if question_id %}
+        let questionId = {{question_id}}
+        let question = new Question(SendQuizTourAnswer)
+        {% else %}
+        let question = new Question(SendAnswer)
+        {% endif %}
+
+        let params = {
+            personId2person: {{person_id2person|tojson}},
+            movieId2scale: {{movie_id2scale|tojson}},
+        }
+
+        question.Build({{question|tojson}}, {{movie|tojson}}, params)
     </script>
     {% include "components/footer.html" %}
 </body>

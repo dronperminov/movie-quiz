@@ -169,7 +169,7 @@ class MovieByActorsQuestion(Question):
 
     @classmethod
     def generate(cls: Self, movie: Movie, username: str, person_id2person: Dict[int, Person], hide_actor_photos: bool) -> Self:
-        actors = [person_id2person[actor.person_id] for actor in movie.actors[::-1]]
+        actors = [person_id2person[actor.person_id] for actor in movie.actors[:10][::-1]]
         question = cls(title=movie.get_question_title(" по актёрам"), answer=movie.get_question_answer(), actors=actors, hide_actor_photos=hide_actor_photos)
         question.init_base(question_type=QuestionType.MOVIE_BY_ACTORS, username=username, movie_id=movie.movie_id)
         return question
@@ -178,7 +178,7 @@ class MovieByActorsQuestion(Question):
         super().update(movie, person_id2person, settings)
         self.title = movie.get_question_title(" по актёрам")
         self.answer = movie.get_question_answer()
-        self.actors = [person_id2person[actor.person_id] for actor in movie.actors[::-1]]
+        self.actors = [person_id2person[actor.person_id] for actor in movie.actors[:10][::-1]]
         self.hide_actor_photos = settings.hide_actor_photos
         return self
 
@@ -192,8 +192,13 @@ class MovieByCharactersQuestion(Question):
 
     @classmethod
     def generate(cls: Self, movie: Movie, username: str) -> Self:
-        characters = [actor.description for actor in movie.actors[:random.randint(3, 5)]]
-        question = cls(title=movie.get_question_title(" по именам персонажей"), answer=movie.get_question_answer(), characters=characters)
+        characters = []
+
+        for actor in movie.actors:
+            if actor.description not in characters:
+                characters.append(actor.description)
+
+        question = cls(title=movie.get_question_title(" по именам персонажей"), answer=movie.get_question_answer(), characters=characters[:random.randint(3, 5)])
         question.init_base(question_type=QuestionType.MOVIE_BY_CHARACTERS, username=username, movie_id=movie.movie_id)
         return question
 

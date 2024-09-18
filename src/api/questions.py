@@ -41,13 +41,21 @@ def get_question(user: Optional[User] = Depends(get_user)) -> Response:
     return HTMLResponse(content=content)
 
 
-@router.post("/question")
-def post_question(user: Optional[User] = Depends(get_user)) -> JSONResponse:
+@router.post("/answer-question")
+def answer_question(answer: QuestionAnswer, user: Optional[User] = Depends(get_user)) -> JSONResponse:
+    if not user:
+        return JSONResponse({"status": "error", "message": "Пользователь не авторизован"})
+
+    if not questions_database.have_question(user.username):
+        return JSONResponse({"status": "error", "message": "В базе отсутствует вопрос, на который можно ответить"})
+
+    questions_database.answer_question(user.username, answer)
+
     settings = database.get_settings(username=user.username)
     question = questions_database.get_question(settings)
 
     if question is None:
-        return JSONResponse({"status": "error", "message": "Нет КМС, удовлетворяющих выбранным настройкам."})
+        return JSONResponse({"status": "success", "question": None, "message": "Нет КМС, удовлетворяющих выбранным настройкам."})
 
     movie = movie_database.get_movie(movie_id=question.movie_id)
     person_id2person = movie_database.get_movies_persons(movies=[movie])
@@ -60,15 +68,3 @@ def post_question(user: Optional[User] = Depends(get_user)) -> JSONResponse:
         "person_id2person": jsonable_encoder(person_id2person),
         "movie_id2scale": jsonable_encoder(movie_id2scale)
     })
-
-
-@router.post("/answer-question")
-def answer_question(answer: QuestionAnswer, user: Optional[User] = Depends(get_user)) -> JSONResponse:
-    if not user:
-        return JSONResponse({"status": "error", "message": "Пользователь не авторизован"})
-
-    if not questions_database.have_question(user.username):
-        return JSONResponse({"status": "error", "message": "В базе отсутствует вопрос, на который можно ответить"})
-
-    questions_database.answer_question(user.username, answer)
-    return JSONResponse({"status": "success"})

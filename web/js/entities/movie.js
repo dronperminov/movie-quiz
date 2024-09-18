@@ -27,12 +27,14 @@ function Movie(data, params) {
 
 Movie.prototype.Build = function() {
     let movie = MakeElement("movie")
-    let movieImage = MakeElement("movie-image", movie)
+    let movieMain = MakeElement("movie-main", movie)
+
+    let movieImage = MakeElement("movie-image", movieMain)
     let movieImageLink = MakeElement("", movieImage, {href: `/movies/${this.movieId}`}, "a")
     MakeElement("", movieImageLink, {src: this.posterUrl, loading: "lazy"}, "img")
     this.BuildRating(movieImage)
 
-    let movieInfo = MakeElement("movie-data", movie)
+    let movieInfo = MakeElement("movie-data", movieMain)
 
     let movieName = MakeElement("movie-name", movieInfo)
     this.BuildScale(movieName)
@@ -45,9 +47,11 @@ Movie.prototype.Build = function() {
     let div = MakeElement("", movieControls)
     MakeElement("gradient-link", div, {href: `/movies/${this.movieId}`, innerText: "Смотреть"}, "a")
 
-    let movieMenu = MakeElement("movie-menu", movie)
+    let movieMenu = MakeElement("movie-menu", movieMain)
     let verticalHam = MakeElement("vertical-ham", movieMenu, {innerHTML: "<div></div><div></div><div></div>"})
     verticalHam.addEventListener("click", () => infos.Show(`movie-${this.movieId}`))
+
+    this.BuildQuestionStatus(movie)
 
     return movie
 }
@@ -259,6 +263,28 @@ Movie.prototype.BuildRating = function(parent) {
     let rating = Math.round(this.rating.rating_kp * 10)
 
     MakeElement("movie-rating", parent, {innerText: `${Math.floor(rating / 10)}.${rating % 10}`, style: `background-color: ${color}`})
+}
+
+Movie.prototype.BuildQuestionStatus = function(parent) {
+    if (!this.params.movieId2status || !(this.movieId in this.params.movieId2status))
+        return
+
+    let status = this.params.movieId2status[this.movieId]
+    let correct = status.reduce((sum, value) => sum + value, 0)
+    let scale = correct * 100 / status.length
+    let color = `hsl(${scale * 1.2}, 70%, 50%)`
+    let text = `${GetWordForm(correct, ['игрок', 'игрока', 'игроков'])} из ${status.length}`
+    let html = `<b>средний балл</b>: <div class="circle" style="background-color: ${color};"></div>${Round(scale, 10)}% (${text})`
+
+    MakeElement("question-status", parent, {innerHTML: html})
+
+    if (!this.params.movieId2correct || !(this.movieId in this.params.movieId2correct))
+        return
+
+    if (this.params.movieId2correct[this.movieId])
+        parent.classList.add("movie-correct")
+    else
+        parent.classList.add("movie-incorrect")
 }
 
 Movie.prototype.GetShortInfo = function() {

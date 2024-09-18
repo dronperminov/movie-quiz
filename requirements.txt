@@ -9,6 +9,7 @@ pydub
 pymongo
 pyjwt
 python-multipart
+rapidfuzz
 requests
 uvicorn[standard]
 wget

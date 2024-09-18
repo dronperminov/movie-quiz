@@ -105,7 +105,7 @@ class QuestionsDatabase:
         return self.movie_database.get_movies(movie_ids=[movie["movie_id"] for movie in movies])
 
     def get_question_movies(self, settings: QuestionSettings) -> List[dict]:
-        return list(self.database.movies.find(settings.to_query(), {"movie_id": 1, "movie_type": 1, "production": 1, "year": 1}))
+        return list(self.database.movies.find(settings.to_query(), {"movie_id": 1, "name": 1, "movie_type": 1, "production": 1, "year": 1}))
 
     def get_movies_scales(self, user: Optional[User], movies: List[Movie]) -> Dict[int, dict]:
         if not user:
