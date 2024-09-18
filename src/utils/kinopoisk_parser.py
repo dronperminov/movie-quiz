@@ -1,9 +1,11 @@
 import logging
 import random
+import re
 import time
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Tuple
 
 import requests
+from Levenshtein import ratio
 from bs4 import BeautifulSoup
 
 from src.enums import Genre, MovieType, Production
@@ -57,8 +59,8 @@ class KinopoiskParser:
             "movie_type": MovieType.from_kinopoisk(movie["type"]).value,
             "year": movie["year"],
             "slogan": movie["slogan"] if movie["slogan"] else "",
-            "description": self.__get_spoilers(text=description, names=names),
-            "short_description": self.__get_spoilers(text=short_description, names=names),
+            "description": self.__get_spoilers(text=description, names=[movie["name"], *names]),
+            "short_description": self.__get_spoilers(text=short_description, names=[movie["name"], *names]),
             "production": [production.value for production in Production.from_countries(countries=countries)],
             "countries": countries,
             "genres": [Genre.from_kinopoisk(genre["name"]).value for genre in movie["genres"]],
@@ -69,7 +71,7 @@ class KinopoiskParser:
             "image_urls": [self.__fix_url(image["url"]) for image in images],
             "poster_url": self.__fix_url(movie["poster"]["previewUrl"]),
             "banner_url": self.__fix_url(backdrop["url"]) if backdrop["url"] is not None else None,
-            "facts": [self.__get_spoilers(text=BeautifulSoup(fact["value"], "html.parser").text, names=names) for fact in facts] if facts else [],
+            "facts": [self.__get_spoilers(text=BeautifulSoup(fact["value"], "html.parser").text, names=[movie["name"], *names]) for fact in facts] if facts else [],
             "alternative_names": sorted(names)
         }
 
@@ -93,8 +95,40 @@ class KinopoiskParser:
 
         return filtered
 
-    def __get_spoilers(self, text: str, names: Set[str]) -> dict:
-        return {"text": text, "spoilers": []}  # TODO
+    def __get_spoilers(self, text: str, names: List[str]) -> dict:
+        names = sorted({name.lower() for name in names}, key=lambda name: -len(name))
+        spans = set()
+
+        for match in re.finditer(r"|".join(rf"{re.escape(name)}" if " " in name else rf'"{re.escape(name)}"|«{re.escape(name)}»' for name in names), text.lower()):
+            start, end = match.span()
+
+            if match.group().startswith(('"', "«")):
+                start, end = start + 1, end - 1
+
+            if not self.__is_span_included(start, end, spans):
+                spans.add((start, end))
+
+        for match in re.finditer(r'«[^»]+?»|"[^"]+?"', text.lower()):
+            best_ratio = max(ratio(match.group(), name) for name in names)
+            start, end = match.span()
+
+            if best_ratio >= 0.8 and not self.__is_span_included(start + 1, end - 1, spans):
+                spans.add((start + 1, end - 1))
+
+        return {"text": text, "spoilers": [{"start": start, "end": end} for start, end in sorted(spans)]}
+
+    def __is_span_included(self, start: int, end: int, spans: Set[Tuple[int, int]]) -> bool:
+        for span_start, span_end in spans:
+            if span_start <= start <= span_end:
+                return True
+
+            if span_start <= end <= span_end:
+                return True
+
+            if start <= span_start and span_end <= end:
+                return True
+
+            return False
 
     def __fix_url(self, url: str) -> str:
         kp2api = {
