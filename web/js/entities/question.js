@@ -31,7 +31,7 @@ Question.prototype.BuildSpecific = function() {
         MakeElement("question-text", this.block, {innerText: this.question.slogan})
     }
     else if (this.questionType == "movie_by_short_description" || this.questionType == "movie_by_description") {
-        MakeElement("question-text", this.block, {innerText: this.question.description.text}) // TODO
+        MakeElement("question-text", this.block, {innerHTML: this.movie.GetSpoileredText(this.question.description)})
     }
     else if (this.questionType == "movie_by_actors") {
         let actors = MakeElement("question-actors", this.block)
@@ -53,6 +53,9 @@ Question.prototype.BuildSpecific = function() {
         let characters = this.question.characters.map(character => `<li>${character}</li>`).join("")
         MakeElement("question-text", this.block, {innerHTML: `<ul>${characters}</ul>`})
     }
+
+    for (let spoiler of document.getElementsByClassName("spoiler"))
+        spoiler.classList.add("spoiler-hidden")
 }
 
 Question.prototype.BuildShowAnswerButton = function() {
@@ -90,6 +93,9 @@ Question.prototype.ShowAnswer = function(correct = null) {
 
     let answerBlock = document.getElementById("answer")
     answerBlock.classList.remove("hidden")
+
+    for (let spoiler of document.getElementsByClassName("spoiler"))
+        spoiler.classList.remove("spoiler-hidden")
 
     this.UpdateAnswerButtons(correct)
 }

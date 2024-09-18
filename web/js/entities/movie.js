@@ -66,10 +66,10 @@ Movie.prototype.BuildPage = function(blockId = "movie") {
     MakeElement("movie-sub-info", movie, {innerText: this.GetSubInfo()})
 
     if (this.shortDescription.text.length > 0)
-        MakeElement("movie-short-description", movie, {innerText: this.shortDescription.text})
+        MakeElement("movie-short-description", movie, {innerHTML: this.GetSpoileredText(this.shortDescription)})
 
     if (this.description.text.length > 0) {
-        let description = MakeElement("movie-description", movie, {innerText: this.description.text})
+        let description = MakeElement("movie-description", movie, {innerHTML: this.GetSpoileredText(this.description)})
         let link = MakeElement("movie-description-link", movie, {innerText: "Полное описание"})
         link.addEventListener("click", () => {
             description.classList.toggle("movie-description-open")
@@ -131,7 +131,7 @@ Movie.prototype.BuildPageFacts = function(parent) {
     let facts = MakeElement("movie-facts", parent)
 
     for (let fact of this.facts)
-        MakeElement("movie-fact", facts, {innerText: fact.text})
+        MakeElement("movie-fact", facts, {innerHTML: this.GetSpoileredText(fact)})
 }
 
 Movie.prototype.BuildInfo = function() {
@@ -154,10 +154,10 @@ Movie.prototype.BuildInfo = function() {
         MakeElement("info-line", info, {innerHTML: `<b>Слоган</b>: ${this.slogan}`})
 
     if (this.description.text.length > 0)
-        MakeElement("info-line", info, {innerHTML: `<b>Описание</b>: ${this.description.text}`})
+        MakeElement("info-line", info, {innerHTML: `<b>Описание</b>: ${this.GetSpoileredText(this.description)}`})
 
     if (this.shortDescription.text.length > 0)
-        MakeElement("info-line", info, {innerHTML: `<b>Короткое описание</b>: ${this.shortDescription.text}`})
+        MakeElement("info-line", info, {innerHTML: `<b>Короткое описание</b>: ${this.GetSpoileredText(this.shortDescription)}`})
 
     MakeElement("info-line", info, {innerHTML: `<b>Производство</b>: ${this.production.ToRus()}`})
     MakeElement("info-line", info, {innerHTML: `<b>Стран${this.countries.length == 1 ? "а" : "ы"}</b>: ${this.countries.join(", ")}`})
@@ -325,6 +325,20 @@ Movie.prototype.GetDirectors = function() {
     }
 
     return directors.join(", ")
+}
+
+Movie.prototype.GetSpoileredText = function(text) {
+    let spoilered = []
+    let start = 0
+
+    for (let span of text.spoilers) {
+        spoilered.push(text.text.slice(start, span[0]))
+        spoilered.push(`<span class="spoiler">${text.text.slice(span[0], span[1])}</span>`)
+        start = span[1]
+    }
+
+    spoilered.push(text.text.slice(start))
+    return spoilered.join("")
 }
 
 Movie.prototype.Remove = function(buttons) {
