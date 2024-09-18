@@ -96,10 +96,13 @@ class KinopoiskParser:
         return filtered
 
     def __get_spoilers(self, text: str, names: List[str]) -> dict:
+        text = re.sub(r"\s+", " ", text).strip()
+
         names = sorted({name.lower() for name in names}, key=lambda name: -len(name))
+        escaped_names = [re.escape(re.sub(r"\s+", " ", name).strip()) for name in names]
         spans = set()
 
-        for match in re.finditer(r"|".join(rf"{re.escape(name)}" if " " in name else rf'"{re.escape(name)}"|«{re.escape(name)}»' for name in names), text.lower()):
+        for match in re.finditer(r"|".join(rf"{name}" if " " in name else rf'"{name}"|«{name}»' for name in escaped_names), text.lower()):
             start, end = match.span()
 
             if match.group().startswith(('"', "«")):
