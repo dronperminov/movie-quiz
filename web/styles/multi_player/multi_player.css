@@ -1,0 +1,298 @@
+.multi-player {
+    padding: 1em;
+    border-radius: 1em;
+    background-color: var(--block-background);
+    margin: 1em 0;
+}
+
+.multi-player label {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.multi-player input {
+    margin-bottom: 1em;
+}
+
+.multi-player-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0.7em;
+}
+
+.multi-player-options {
+    margin-bottom: 1em;
+    font-size: 0.9em;
+}
+
+.session-info {
+    margin: 1em 0;
+    padding: 0.5em;
+    background-color: var(--block-background);
+    border-radius: 0.5em;
+}
+
+.session-info-id {
+    margin-bottom: 0.2em;
+    font-size: 0.75em;
+    text-align: right;
+}
+
+.session-info-buttons {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 0.7em;
+    grid-auto-columns: 1fr;
+}
+
+.session-settings {
+    margin-top: 1em;
+}
+
+.session-settings[disabled] .session-settings-inputs * {
+    color: var(--subtext-color);
+    pointer-events: none;
+}
+
+.session-settings-inputs {
+    max-height: 0;
+    overflow-y: auto;
+    resize: vertical;
+    font-size: 0.9em;
+    transition: max-height 0.2s linear;
+}
+
+.session-settings-open .session-settings-inputs {
+    min-height: 100px;
+    height: 250px;
+    max-height: 250px;
+    transition: max-height 0.2s linear;
+}
+
+.session-chat {
+    margin-top: 0.8em;
+}
+
+.session-chat-controls {
+    display: grid;
+    grid-template-columns: 1fr min-content;
+    grid-gap: 0.1em;
+    height: 0;
+    margin-top: -0.3em;
+    overflow: hidden;
+}
+
+.session-chat-open .session-chat-controls {
+    height: 24px;
+    overflow: unset;
+}
+
+.session-chat-controls img {
+    width: 24px;
+    height: 24px;
+    transition: width 0.2s;
+}
+
+.session-chat-hidden {
+    width: 0 !important;
+    transition: width 0.2s;
+}
+
+.session-chat-messages:not(:empty) {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 0.5em;
+    max-height: 0;
+    overflow-y: hidden;
+    transition: max-height 0.1s;
+    margin-top: 0.2em;
+}
+
+.session-chat-open .session-chat-messages:not(:empty) {
+    overflow-y: auto;
+    max-height: 250px;
+    transition: max-height 0.1s;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    border: 1px solid var(--border-color);
+}
+
+.session-chat-open .session-header-description {
+    display: none;
+}
+
+.connected-users {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    max-width: 100%;
+    overflow-x: auto;
+    grid-gap: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.connected-user {
+    max-width: 35px;
+}
+
+.connected-user img {
+    width: 100%;
+    border-radius: 100%;
+    border: 2px solid var(--text-color);
+}
+
+.answered-correct-user img {
+    border-color: var(--correct-color);
+}
+
+.answered-incorrect-user img {
+    border-color: var(--incorrect-color);
+}
+
+.session-header {
+    margin-bottom: 0.5em;
+    font-weight: bold;
+}
+
+.session-header-description {
+    font-size: 0.9em;
+    color: var(--subtext-color);
+    margin: -0.5em 0 0.5em 0;
+}
+
+.session-statistics {
+    margin-top: 1em;
+    background-color: var(--block-background);
+    padding: 0.5em;
+    border-radius: 1em;
+}
+
+.session-statistics-items {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 0.5em;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.session-statistics-item {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: center;
+    grid-gap: 0.7em;
+    color: var(--subtext-color);
+    font-size: 0.9em;
+}
+
+.session-statistics-item img {
+    border-radius: 100%;
+    width: 100%;
+    vertical-align: middle;
+    border: 1px solid var(--text-color);
+}
+
+.session-history {
+    margin-top: 1em;
+    background-color: var(--block-background);
+    padding: 0.5em;
+    border-radius: 1em;
+}
+
+.session-history-actions {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 0.5em;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.session-history-action {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    align-items: center;
+    grid-gap: 0.3em;
+    color: var(--subtext-color);
+    font-size: 0.8em;
+}
+
+.session-history-action-user img {
+    border-radius: 100%;
+    width: 100%;
+    vertical-align: middle;
+    border: 1px solid var(--text-color);
+}
+
+.session-history-action .correct, .notification .correct {
+    font-weight: bold;
+    color: var(--correct-color);
+}
+
+.session-history-action .incorrect, .notification .incorrect {
+    font-weight: bold;
+    color: var(--incorrect-color);
+}
+
+.content {
+    position: relative;
+}
+
+.hidden-menu .content {
+    margin-bottom: 35px;
+}
+
+.hidden-menu #notifications {
+    bottom: 45px;
+}
+
+.reactions {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    bottom: 0px;
+    padding: 5px;
+    position: fixed;
+    z-index: 2;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--block-background);
+}
+
+.reaction-items {
+    margin: 0 auto;
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    max-width: 100%;
+    overflow-x: auto;
+    align-items: center;
+    justify-items: center;
+}
+
+.reaction-items .reaction {
+    max-width: 45px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.reaction-items img {
+    width: 24px;
+    cursor: pointer;
+}
+
+.reaction {
+    width: 20px;
+    vertical-align: middle;
+}
+
+.question-title {
+    max-width: calc(100% - 30px);
+}
+
+.track-question {
+    position: initial;
+}
+
+.track-question .track-menu {
+    top: 10px;
+}

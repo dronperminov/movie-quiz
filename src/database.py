@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from pymongo import ASCENDING, MongoClient
 
+from src.entities.session import Session
 from src.entities.settings import Settings
 from src.entities.user import User
 from src.enums import UserRole
@@ -23,6 +24,7 @@ class Database:
     quiz_tours = None
     quiz_tour_questions = None
     quiz_tour_answers = None
+    sessions = None
 
     def __init__(self, mongo_url: str, database_name: str) -> None:
         self.mongo_url = mongo_url
@@ -78,6 +80,9 @@ class Database:
         self.quiz_tour_answers.create_index(([("username", ASCENDING)]))
         self.quiz_tour_answers.create_index(([("correct", ASCENDING)]))
 
+        self.sessions = database["sessions"]
+        self.sessions.create_index([("session_id", ASCENDING)], unique=True)
+
     def get_user(self, username: str) -> Optional[User]:
         if not username:
             return None
@@ -104,6 +109,10 @@ class Database:
 
     def update_settings(self, settings: Settings) -> None:
         self.settings.update_one({"username": settings.username}, {"$set": settings.to_dict()})
+
+    def get_session(self, session_id: str) -> Optional[Session]:
+        session: dict = self.sessions.find_one({"session_id": session_id})
+        return Session.from_dict(session) if session else None
 
     def drop(self) -> None:
         self.client.drop_database(self.database_name)

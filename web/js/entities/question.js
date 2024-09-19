@@ -157,13 +157,8 @@ Question.prototype.UpdateAnswerButtons = function(correct = null) {
 }
 
 Question.prototype.SendAnswer = function(correct) {
-    let buttons = [
-        document.getElementById("answer-button-correct"),
-        document.getElementById("answer-button-incorrect")
-    ]
+    this.UpdateAnswerButtons(correct)
 
-    for (let button of buttons)
-        button.setAttribute("disabled", "")
-
+    let buttons = [document.getElementById("answer-button-correct"), document.getElementById("answer-button-incorrect")]
     this.sendAnswer(correct, this.answerTime, buttons)
 }

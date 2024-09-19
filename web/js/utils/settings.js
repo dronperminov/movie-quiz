@@ -1,7 +1,7 @@
 function GetYearsList(yearsSettings) {
     let years = []
 
-    for (let [year, scale] of Object.entries(yearsSettings)) {
+    for (let [year, value] of Object.entries(yearsSettings)) {
         let [startYear, endYear] = year.split("-")
         if (startYear !== "")
             startYear = +startYear
@@ -9,7 +9,7 @@ function GetYearsList(yearsSettings) {
         if (endYear !== "")
             endYear = +endYear
 
-        years.push({start_year: startYear, end_year: endYear, scale: scale})
+        years.push({start_year: startYear, end_year: endYear, value: value})
     }
 
     return years
@@ -19,7 +19,7 @@ function GetYearsDict(yearsSettings) {
     let years = {}
 
     for (let year of yearsSettings)
-        years[`${year.start_year}-${year.end_year}`] = year.scale
+        years[`${year.start_year}-${year.end_year}`] = year.value
 
     return years
 }

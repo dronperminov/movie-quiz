@@ -81,7 +81,8 @@ class KinopoiskParser:
             "poster_url": self.__fix_url(movie["poster"]["previewUrl"]),
             "banner_url": self.__fix_url(backdrop["url"]) if backdrop["url"] is not None else None,
             "facts": [self.__get_spoilers(text=BeautifulSoup(fact["value"], "html.parser").text, names=[movie["name"], *names]) for fact in facts] if facts else [],
-            "alternative_names": sorted(names)
+            "alternative_names": sorted(names),
+            "sequels": []
         }
 
     def __filter_persons(self, persons: List[dict], profession: str) -> List[dict]:

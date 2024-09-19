@@ -34,6 +34,7 @@ function GetActionDiff(action, key, diff) {
         "cites": "цитаты",
         "tracks": "треки",
         "alternative_names": "альтернативные названия",
+        "sequels": "сиквелы/приквелы",
 
         "photo_url": "фото"
     }

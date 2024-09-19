@@ -38,7 +38,7 @@ class TestMovieDatabaseReal(AbstractMovieDatabaseTest):
     def test_2_insert_movie_and_cartoon(self) -> None:
         self.add_from_kinopoisk("real/movie_and_cartoon.json")
         self.assertEqual(self.movie_database.get_movies_count(), 4)
-        self.assertEqual(self.movie_database.get_persons_count(), 191)
+        self.assertEqual(self.movie_database.get_persons_count(), 121)
 
         person = self.movie_database.get_person(person_id=52)
         self.assertIsNotNone(person)

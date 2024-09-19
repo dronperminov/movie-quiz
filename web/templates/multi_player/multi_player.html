@@ -1,0 +1,137 @@
+{% set title = "Мультиплеерная тренировка | КМС квиз Плюшевой наковальни" %}
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/utils/history.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/utils/info_panels.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/movies/movies.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/user/question.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/user/settings.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/multi_player/multi_player.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+
+    <div class="content">
+        <div id="page-header">
+            <h1>Мультиплеерная тренировка</h1>
+            <p>Играй с друзьями в режиме реального времени! Создай сессию, поделись ссылкой и вперёд!</p>
+        </div>
+
+        <div id="question"></div>
+
+        <div class="reactions hidden" id="reactions">
+            <div class="reaction-items">
+                <div class="reaction" onclick="multiPlayer.SendReaction('poo')"><img src="/images/reactions/poo.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('heart')"><img src="/images/reactions/heart.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('angry')"><img src="/images/reactions/angry.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('crying')"><img src="/images/reactions/crying.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('happy')"><img src="/images/reactions/happy.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('anguished')"><img src="/images/reactions/anguished.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('monkey')"><img src="/images/reactions/monkey.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('party-popper')"><img src="/images/reactions/party-popper.svg"></div>
+                <div class="reaction" onclick="multiPlayer.SendReaction('clapping')"><img src="/images/reactions/clapping.svg"></div>
+            </div>
+        </div>
+
+        <div class="multi-player" id="multi-player-manager">
+            <label for="session-id">Идентификатор сессии:</label>
+            <input class="basic-input" id="session-id" type="text" placeholder="введите название сессии" oninput="InputSessionId()" value="{{session_id}}">
+
+            <div class="multi-player-options">
+                <label class="switch-checkbox">
+                    <input type="checkbox" id="remove-statistics-on-connect">
+                    <span class="switch-checkbox-slider"></span>
+                </label>
+                <label for="remove-statistics-on-connect">Сбрасывать статистику</label>
+                <div class="description">при подключении автора к сессии</div>
+            </div>
+
+            <div class="multi-player-buttons">
+                <button class="basic-button gradient-button" id="create-button" onclick="CreateSession()">Создать</button>
+                <button class="basic-button gradient-button" id="connect-button" onclick="ConnectSession()">Подключиться</button>
+            </div>
+        </div>
+
+        <div class="session-info hidden" id="session-info">
+            <div class="session-info-id">сессия: <b><span id="session-id-span"></span></b>, <span id="connected-users-count">0 пользователей</span></div>
+            <div class="connected-users" id="connected-users"></div>
+            <div class="session-info-buttons" id="connection-block">
+                <button class="basic-button gradient-button" id="disconnect-button" onclick="multiPlayer.Disconnect()">Отключиться</button>
+                <button class="basic-button gradient-button hidden" id="remove-session-button" onclick="multiPlayer.RemoveSession()">Удалить сессию</button>
+            </div>
+            <div class="session-settings" id="session-settings">
+                <div class="session-header" onclick="this.parentNode.classList.toggle('session-settings-open')">Настройки</div>
+                <div class="session-header-description">Нажмите, чтобы показать настройки сессии</div>
+
+                <div class="session-settings-inputs">
+                {% include "components/question_settings.html" %}
+                </div>
+            </div>
+            <div class="session-chat session-chat-open">
+                <div class="session-header" onclick="this.parentNode.classList.toggle('session-chat-open')">Чат</div>
+                <div class="session-header-description">Нажмите, чтобы показать чат</div>
+                <div class="session-chat-controls">
+                    <div><input class="basic-input" type="text" inputmode="search" placeholder="напишите что-нибудь" id="session-chat-text"></div>
+                    <div><img class="session-chat-hidden" id="session-chat-send" src="/images/send.svg"></div>
+                </div>
+                <div class="session-chat-messages" id="session-chat-messages"></div>
+            </div>
+        </div>
+
+        <div class="session-statistics hidden" id="session-statistics">
+            <div class="session-header">Статистика:</div>
+            <div class="session-statistics-items" id="session-statistics-items"></div>
+        </div>
+
+        <div class="session-history hidden" id="session-history">
+            <div class="session-header">Последние действия:</div>
+            <div class="session-history-actions" id="session-history-actions"></div>
+        </div>
+    </div>
+
+    <script src="/js/utils/utils.js?v={{version}}"></script>
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+    <script src="/js/utils/settings.js?v={{version}}"></script>
+    <script src="/js/utils/multi_player.js?v={{version}}"></script>
+    <script src="/js/utils/swipe_handler.js?v={{version}}"></script>
+    <script src="/js/utils/info_panels.js?v={{version}}"></script>
+    <script src="/js/utils/parse.js?v={{version}}"></script>
+    <script src="/js/utils/history.js?v={{version}}"></script>
+
+    <script src="/js/entities/movie_type.js?v={{version}}"></script>
+    <script src="/js/entities/genre.js?v={{version}}"></script>
+    <script src="/js/entities/production.js?v={{version}}"></script>
+    <script src="/js/entities/metadata.js?v={{version}}"></script>
+    <script src="/js/entities/movie.js?v={{version}}"></script>
+    <script src="/js/entities/question.js?v={{version}}"></script>
+
+    <script src="/js/inputs/multi_select.js?v={{version}}"></script>
+    <script src="/js/inputs/number_input.js?v={{version}}"></script>
+    <script src="/js/inputs/interval_input.js?v={{version}}"></script>
+    <script src="/js/inputs/balance_input.js?v={{version}}"></script>
+
+    <script src="/js/user/question.js?v={{version}}"></script>
+    <script src="/js/multi_player/multi_player.js?v={{version}}"></script>
+    <script>
+        let answerTimeInput = new NumberInput("answer-time", 0, Infinity, /^\d+$/g, {{question_settings.answer_time}}, UpdateQuestionSettings)
+
+        let movieTypesInput = new BalanceInput("movie-types", "Необходимо выбрать хотя бы один тип КМС", { {% for movie_type, value in question_settings.movie_types.items() %}"{{movie_type.value}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let productionInput = new BalanceInput("production", "Необходимо выбрать хотя бы один вариант", { {% for production, value in question_settings.production.items() %}"{{production.value}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let votesInput = new IntervalInput("votes", true, {{question_settings.votes|tojson}}, UpdateQuestionSettings)
+        let yearsInput = new BalanceInput("years", "Необходимо выбрать хотя бы один временной промежуток", { {% for (start_year, end_year), value in question_settings.years.items() %}"{{start_year}}-{{end_year}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let questionTypesInput = new BalanceInput("question-types", "Необходимо выбрать хотя бы один тип вопроса", { {% for question_type, value in question_settings.question_types.items() %}"{{question_type.value}}": {{value}},{% endfor %}}, UpdateQuestionSettings)
+        let repeatIncorrectProbabilityInput = new NumberInput("repeat-incorrect-probability", 0, 100, /^\d{1,3}(\.\d+)?$/g, {{question_settings.repeat_incorrect_probability * 100}}, UpdateQuestionSettings)
+    
+        let infos = new InfoPanels()
+
+        let multiPlayer = new MultiPlayer("connected-users")
+
+        {% if session_id %}
+        localStorage.removeItem("sessionId")
+        ConnectSession()
+        {% endif %}
+
+        document.addEventListener("DOMContentLoaded", () => Load())
+    </script>
+    {% include "components/footer.html" %}
+</body>
+</html>

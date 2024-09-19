@@ -39,17 +39,17 @@
     background-color: #f5e5e5;
 }
 
-.movie .movie-image {
+.short-movie .movie-image, .movie .movie-image {
     cursor: pointer;
     position: relative;
 }
 
-.movie .movie-image:hover img {
+.short-movie .movie-image:hover img, .movie .movie-image:hover img {
     padding: 0;
     border: 2px solid var(--main-color);
 }
 
-.movie .movie-image img {
+.short-movie .movie-image img, .movie .movie-image img {
     padding: 2px;
     width: 100%;
     border-radius: 8px;
@@ -63,7 +63,7 @@
     top: 5px;
 }
 
-.movie .movie-rating {
+.movie-rating {
     padding: 2px 4px;
     border-radius: 3px;
     font-weight: bold;
@@ -85,12 +85,12 @@
     text-align: left;
 }
 
-.movie .movie-name a {
+.short-movie .movie-name a, .movie .movie-name a {
     color: var(--text-color);
     text-decoration: none;
 }
 
-.movie .movie-name a:hover {
+.short-movie .movie-name a:hover, .movie .movie-name a:hover {
     color: var(--main-color);
 }
 

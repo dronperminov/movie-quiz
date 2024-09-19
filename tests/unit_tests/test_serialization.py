@@ -141,7 +141,8 @@ class TestSerialization(TestCase):
             cites=[4, 8, 123],
             tracks=[6, 9, 2345],
             alternative_names=["name1", "another MEGA NAME"],
-            metadata=Metadata.initial(username="user")
+            metadata=Metadata.initial(username="user"),
+            sequels=[2, 6, 8]
         )
 
         movie_dict = movie.to_dict()
