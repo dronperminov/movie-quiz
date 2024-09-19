@@ -89,6 +89,9 @@ Question.prototype.BuildSpecific = function() {
         let characters = this.question.characters.map(character => `<li>${character}</li>`).join("")
         MakeElement("question-text", this.block, {innerHTML: `<ul>${characters}</ul>`})
     }
+    else if (this.questionType == "movie_by_cite") {
+        MakeElement("question-text", this.block, {innerHTML: this.movie.GetSpoileredText(this.question.cite)})
+    }
 
     for (let spoiler of document.getElementsByClassName("spoiler"))
         spoiler.classList.add("spoiler-hidden")

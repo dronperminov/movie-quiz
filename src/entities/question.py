@@ -57,6 +57,8 @@ class Question:
             question = MovieByActorsQuestion(title=data["title"], answer=data["answer"], actors=actors, hide_actor_photos=data["hide_actor_photos"])
         elif question_type == QuestionType.MOVIE_BY_CHARACTERS:
             question = MovieByCharactersQuestion(title=data["title"], answer=data["answer"], characters=data["characters"])
+        elif question_type == QuestionType.MOVIE_BY_CITE:
+            question = MovieByCiteQuestion(title=data["title"], answer=data["answer"], cite=SpoilerText.from_dict(data["cite"]))
         else:
             raise ValueError(f'Invalid question_type "{question_type}"')
 
@@ -210,3 +212,23 @@ class MovieByCharactersQuestion(Question):
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), "characters": self.characters}
+
+
+@dataclass
+class MovieByCiteQuestion(Question):
+    cite: SpoilerText
+
+    @classmethod
+    def generate(cls: Self, movie: Movie, username: str, cite: SpoilerText) -> Self:
+        question = cls(title=movie.get_question_title(" по цитате"), answer=movie.get_question_answer(), cite=cite)
+        question.init_base(question_type=QuestionType.MOVIE_BY_CITE, username=username, movie_id=movie.movie_id)
+        return question
+
+    def update(self, movie: Movie, person_id2person: Dict[int, Person], settings: QuestionSettings) -> Self:
+        super().update(movie, person_id2person, settings)
+        self.title = movie.get_question_title(" по цитате")
+        self.answer = movie.get_question_answer()
+        return self
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "cite": self.cite.to_dict()}

@@ -130,6 +130,9 @@ class Movie:
         if self.actors and self.movie_type != MovieType.ANIME:
             question_types.append(QuestionType.MOVIE_BY_CHARACTERS)
 
+        if self.cites:
+            question_types.append(QuestionType.MOVIE_BY_CITE)
+
         return question_types
 
     def get_question_title(self, end: str = "") -> str:

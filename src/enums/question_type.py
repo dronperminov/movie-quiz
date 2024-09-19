@@ -11,6 +11,7 @@ class QuestionType(Enum):
     MOVIE_BY_IMAGE = "movie_by_image"
     MOVIE_BY_ACTORS = "movie_by_actors"
     MOVIE_BY_CHARACTERS = "movie_by_characters"
+    MOVIE_BY_CITE = "movie_by_cite"
 
     def to_rus(self) -> str:
         question_type2rus = {
@@ -20,7 +21,8 @@ class QuestionType(Enum):
             QuestionType.MOVIE_BY_FACT: "КМС по факту",
             QuestionType.MOVIE_BY_IMAGE: "КМС по кадру",
             QuestionType.MOVIE_BY_ACTORS: "КМС по актёрам",
-            QuestionType.MOVIE_BY_CHARACTERS: "КМС по именам персонажей"
+            QuestionType.MOVIE_BY_CHARACTERS: "КМС по именам персонажей",
+            QuestionType.MOVIE_BY_CITE: "КМС по цитате"
         }
         return question_type2rus[self]
 
@@ -45,5 +47,8 @@ class QuestionType(Enum):
 
         if self == QuestionType.MOVIE_BY_CHARACTERS:
             return {"actors": {"$ne": []}, "actors.description": {"$ne": {"$regex": "озвучка"}}, "movie_type": {"$ne": MovieType.ANIME.value}}
+
+        if self == QuestionType.MOVIE_BY_CITE:
+            return {"cites": {"$ne": []}}
 
         raise ValueError(f'Invalid question type "{self}"')

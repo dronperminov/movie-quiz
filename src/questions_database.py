@@ -9,7 +9,8 @@ import numpy as np
 from src.database import Database
 from src.entities.analytics import Analytics
 from src.entities.movie import Movie
-from src.entities.question import MovieByActorsQuestion, MovieByCharactersQuestion, MovieByDescriptionQuestion, MovieByImageQuestion, MovieBySloganQuestion, Question
+from src.entities.question import MovieByActorsQuestion, MovieByCharactersQuestion, MovieByCiteQuestion, MovieByDescriptionQuestion, MovieByImageQuestion, \
+    MovieBySloganQuestion, Question
 from src.entities.question_answer import QuestionAnswer
 from src.entities.question_settings import QuestionSettings
 from src.entities.settings import Settings
@@ -167,6 +168,10 @@ class QuestionsDatabase:
 
         if question_type == QuestionType.MOVIE_BY_CHARACTERS:
             return MovieByCharactersQuestion.generate(movie=movie, username=username)
+
+        if question_type == QuestionType.MOVIE_BY_CITE:
+            cite = random.choice(self.movie_database.get_movies_cites(movies=[movie])[movie.movie_id])
+            return MovieByCiteQuestion.generate(movie=movie, username=username, cite=cite.text)
 
         raise ValueError("Invalid question type")
 

@@ -252,12 +252,15 @@ class MovieDatabase:
         return removed_persons
 
     def add_cite(self, cite: Cite, username: str) -> None:
-        assert self.database.movies.find_one({"movie_id": cite.movie_id}) is not None
+        movie = self.get_movie(movie_id=cite.movie_id)
+        assert movie is not None
 
         action = AddCiteAction(username=username, timestamp=datetime.now(), cite_id=cite.cite_id)
         self.database.cites.insert_one(cite.to_dict())
         self.database.history.insert_one(action.to_dict())
         self.logger.info(f"Added cite {cite.cite_id} for movie {cite.movie_id} by @{username}")
+
+        self.update_movie(movie_id=movie.movie_id, diff=movie.get_diff({"cites": [cite_id for cite_id in movie.cites] + [cite.cite_id]}), username=username)
 
     def remove_cite(self, cite_id: int, username: str) -> None:
         cite = self.database.cites.find_one({"cite_id": cite_id}, {"movie_id": 1})
