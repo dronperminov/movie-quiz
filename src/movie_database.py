@@ -11,6 +11,8 @@ from src.entities.history_action import AddMovieAction, AddPersonAction, EditMov
 from src.entities.metadata import Metadata
 from src.entities.movie import Movie
 from src.entities.person import Person
+from src.entities.quiz_tour import QuizTour
+from src.entities.session import Session
 from src.entities.source import KinopoiskSource
 from src.query_params.movie_search import MovieSearch
 from src.query_params.person_movies import PersonMovies
@@ -146,10 +148,32 @@ class MovieDatabase:
         action = RemoveMovieAction(username=username, timestamp=datetime.now(), movie_id=movie_id)
         self.database.movies.delete_one({"movie_id": movie_id})
 
+        # удаляем вопрос из сессий
+        for session in self.database.sessions.find({"questions.movie_id": movie_id}):
+            session = Session.from_dict(session)
+            session.questions = [question for question in session.questions if question.movie_id != movie_id]
+            if session.question is not None and session.question.movie_id == movie_id:
+                session.question = None
+            self.database.sessions.update_one({"session_id": session.session_id}, {"$set": session.to_dict()})
+
+        # удаляем все вопросы и ответы из туров, связанные с этим фильмом
+        tour_question_ids = [question["question_id"] for question in self.database.quiz_tour_questions.find({"question.movie_id": movie_id}, {"question_id": 1})]
+        self.database.quiz_tour_questions.delete_many({"question_id": {"$in": tour_question_ids}})
+        self.database.quiz_tour_answers.delete_many({"question_id": {"$in": tour_question_ids}})
+        for quiz_tour in self.database.quiz_tours.find({"question_ids": {"$in": tour_question_ids}}):
+            quiz_tour = QuizTour.from_dict(quiz_tour)
+            quiz_tour.remove_questions(set(tour_question_ids))
+
+            if quiz_tour.is_empty():
+                self.database.quiz_tours.delete_one({"quiz_tour_id": quiz_tour.quiz_tour_id})
+            else:
+                self.database.quiz_tours.update_one({"quiz_tour_id": quiz_tour.quiz_tour_id}, {"$set": quiz_tour.to_dict()})
+
         for person in self.database.persons.find({"person_id": {"$in": [person["person_id"] for person in movie["actors"] + movie["directors"]]}}):
             if not self.database.movies.find_one({"$or": [{"actors.person_id": person["person_id"]}, {"directors.person_id": person["person_id"]}]}, {"_id": 1}):
                 self.remove_person(person_id=person["person_id"], username=username)
 
+        self.database.questions.delete_many({"movie_id": movie_id})
         self.database.history.insert_one(action.to_dict())
         self.logger.info(f'Removed movie "{movie["name"]}" ({movie_id}) by @{username}')
 
