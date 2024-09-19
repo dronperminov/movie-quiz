@@ -281,22 +281,42 @@ Movie.prototype.BuildInfoActors = function(parent) {
 }
 
 Movie.prototype.BuildAdmin = function(parent) {
-    let adminBlock = MakeElement("admin-buttons admin-block", parent)
+    let adminBlock = MakeElement("admin-block", parent)
     let buttons = []
 
-    let historyButton = MakeElement("basic-button gradient-button", adminBlock, {innerText: "История изменений"}, "button")
+    let tracksBlock = MakeElement("admin-tracks", adminBlock, {innerHTML: "<b>Треки</b>"})
+    let tracksDescription = MakeElement("description", tracksBlock, {innerText: "Добавление треков"})
+
+    let trackUrlBlock = MakeElement("info-textarea-line", adminBlock)
+    let trackUrlInput = MakeElement("basic-textarea", trackUrlBlock, {type: "text", value: "", placeholder: "https://music.yandex.ru/track/...", id: "track-url"}, "textarea")
+    MakeElement("error", adminBlock, {id: "track-url-error"})
+
+    let trackButton = MakeElement("basic-button gradient-button", adminBlock, {innerText: "Добавить"}, "button")
+    buttons.push(trackButton)
+
+    let adminButtons = MakeElement("admin-buttons admin-block", adminBlock)
+
+    let historyButton = MakeElement("basic-button gradient-button", adminButtons, {innerText: "История изменений"}, "button")
     buttons.push(historyButton)
     historyButton.addEventListener("click", () => ShowHistory(`/movie-history/${this.movieId}`))
 
     if (this.source.name == "kinopoisk") {
-        let button = MakeElement("basic-button gradient-button", adminBlock, {innerText: "Распарсить"}, "button")
+        let button = MakeElement("basic-button gradient-button", adminButtons, {innerText: "Распарсить"}, "button")
         buttons.push(button)
         button.addEventListener("click", () => ParseMovies(buttons, [this.source.kinopoisk_id]))
     }
 
     let removeButton = MakeElement("basic-button red-button", adminBlock, {innerText: `Удалить ${this.movieType.ToRus()}`}, "button")
     buttons.push(removeButton)
+
     removeButton.addEventListener("click", () => this.Remove(buttons))
+
+    tracksDescription.addEventListener("click", () => {
+        trackUrlInput.value = ""
+        trackUrlInput.focus()
+    })
+
+    trackButton.addEventListener("click", () => AddTrack(this.movieId, buttons))
 }
 
 Movie.prototype.BuildRating = function(parent) {

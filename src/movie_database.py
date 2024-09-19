@@ -15,7 +15,7 @@ from src.entities.movie import Movie
 from src.entities.person import Person
 from src.entities.quiz_tour import QuizTour
 from src.entities.session import Session
-from src.entities.source import KinopoiskSource
+from src.entities.source import KinopoiskSource, YandexSource
 from src.entities.track import Track
 from src.query_params.movie_search import MovieSearch
 from src.query_params.person_movies import PersonMovies
@@ -313,6 +313,24 @@ class MovieDatabase:
             self.__add_kinopoisk_movie(kinopoisk_movie=movie, username=username, kinopoisk_id2person_id=kinopoisk_id2person_id)
 
         return self.get_movies_count() - movies_count, self.get_persons_count() - persons_count
+
+    def add_tracks_from_yandex(self, movie_id: int, tracks: List[dict]) -> None:
+        for track in tracks:
+            yandex_id = track.pop("yandex_id")
+            if self.database.tracks.find_one({"source.yandex_id": yandex_id}) is not None:
+                self.logger.info(f"Skip track {yandex_id}")
+                continue
+
+            track = Track.from_dict({
+                **track,
+                "track_id": self.database.get_identifier("tracks"),
+                "movie_id": movie_id,
+                "downloaded": False,
+                "source": YandexSource(yandex_id=yandex_id).to_dict(),
+                "metadata": Metadata.initial(username="dronperminov").to_dict()
+            })
+
+            self.add_track(track=track, username="dronperminov")
 
     def __add_kinopoisk_person(self, kinopoisk_person: dict, username: str) -> int:
         kinopoisk_id: int = kinopoisk_person["kinopoisk_id"]

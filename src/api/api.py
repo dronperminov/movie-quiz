@@ -11,6 +11,7 @@ from src.enums import UserRole
 from src.query_params.direct_link import DirectLink
 from src.query_params.history_query import HistoryQuery
 from src.query_params.movie_parse import MovieParse
+from src.query_params.movie_tracks_parse import MovieTracksParse
 from src.query_params.top_players_query import TopPlayersQuery
 from src.utils.auth import get_user
 from src.utils.common import get_static_hash, get_word_form
@@ -46,6 +47,22 @@ def parse_movies(params: MovieParse, user: Optional[User] = Depends(get_user)) -
         new_movies, new_persons = movie_database.add_from_kinopoisk(movies=movies, username=user.username)
         removed_persons = movie_database.remove_empty_persons(username="dronperminov")
         return JSONResponse({"status": "success", "movies": len(movies), "new_movies": new_movies, "new_persons": new_persons, "removed_persons": removed_persons})
+    except Exception as error:
+        return JSONResponse({"status": "error", "message": str(error)})
+
+
+@router.post("/parse-movie-tracks")
+def parse_movie_tracks(params: MovieTracksParse, user: Optional[User] = Depends(get_user)) -> JSONResponse:
+    if not user:
+        return JSONResponse({"status": "error", "message": "Пользователь не авторизован"})
+
+    if user.role == UserRole.USER:
+        return JSONResponse({"status": "error", "message": "Пользователь не является администратором"})
+
+    try:
+        tracks = yandex_music_parser.parse_tracks(track_ids=params.track_ids)
+        movie_database.add_tracks_from_yandex(movie_id=params.movie_id, tracks=tracks)
+        return JSONResponse({"status": "success", "tracks": len(tracks)})
     except Exception as error:
         return JSONResponse({"status": "error", "message": str(error)})
 

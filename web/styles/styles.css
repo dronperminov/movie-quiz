@@ -474,10 +474,15 @@ h2 + .description {
     color: var(--incorrect-color);
 }
 
-.admin-buttons {
+.admin-tracks {
     margin-top: 1em;
     padding-top: 1em;
     border-top: 1px solid var(--border-color);
+}
+
+.admin-buttons {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
     display: flex;
     flex-wrap: wrap;
     gap: 0.5em;
