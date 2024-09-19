@@ -1,3 +1,4 @@
+import random
 from typing import Optional
 
 from fastapi import APIRouter, Depends
@@ -6,6 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from src import database, movie_database, questions_database
 from src.api import send_error, templates
+from src.entities.question_settings import QuestionSettings
 from src.entities.user import User
 from src.enums import MovieType, Production, UserRole
 from src.query_params.movie_remove import MovieRemove
@@ -56,8 +58,7 @@ def search_movies(params: MovieSearch, user: Optional[User] = Depends(get_user))
     })
 
 
-@router.get("/movies/{movie_id}")
-def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLResponse:
+def get_movie_response(movie_id: int, user: Optional[User]) -> HTMLResponse:
     movie = movie_database.get_movie(movie_id=movie_id)
 
     if movie is None:
@@ -79,6 +80,23 @@ def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLRe
         sequels=jsonable_encoder(sequels)
     )
     return HTMLResponse(content=content)
+
+
+@router.get("/movies/random")
+def get_random_movie(user: Optional[User] = Depends(get_user)) -> HTMLResponse:
+    settings = database.get_settings(username=user.username).question_settings if user else QuestionSettings.default()
+    movies = questions_database.get_question_movies(settings=settings)
+
+    if not movies:
+        movies = questions_database.get_question_movies(settings=QuestionSettings.default())
+
+    movie_id = random.choice([movie["movie_id"] for movie in movies])
+    return get_movie_response(movie_id=movie_id, user=user)
+
+
+@router.get("/movies/{movie_id}")
+def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLResponse:
+    return get_movie_response(movie_id=movie_id, user=user)
 
 
 @router.post("/remove-movie")
