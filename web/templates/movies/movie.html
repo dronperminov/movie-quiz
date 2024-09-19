@@ -27,7 +27,7 @@
 
     <script>
         let infos = new InfoPanels()
-        let movie = new Movie({{movie|tojson}}, {personId2person: {{person_id2person|tojson}}, movieId2scale: {{movie_id2scale|tojson}}})
+        let movie = new Movie({{movie|tojson}}, {personId2person: {{person_id2person|tojson}}, movieId2scale: {{movie_id2scale|tojson}}, cites: {{cites|tojson}}})
         movie.BuildPage({{sequels|tojson}})
     </script>
     {% include "components/footer.html" %}

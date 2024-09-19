@@ -68,8 +68,8 @@ class KinopoiskParser:
             "movie_type": MovieType.from_kinopoisk(movie["type"]).value,
             "year": movie["year"],
             "slogan": self.__clear_spaces(movie["slogan"]) if movie["slogan"] else "",
-            "description": self.__get_spoilers(text=description, names=[movie["name"], *names]),
-            "short_description": self.__get_spoilers(text=short_description, names=[movie["name"], *names]),
+            "description": self.get_spoilers(text=description, names=[movie["name"], *names]),
+            "short_description": self.get_spoilers(text=short_description, names=[movie["name"], *names]),
             "production": [production.value for production in Production.from_countries(countries=countries)],
             "countries": countries,
             "genres": [Genre.from_kinopoisk(genre["name"]).value for genre in movie["genres"]],
@@ -80,7 +80,7 @@ class KinopoiskParser:
             "image_urls": [self.__fix_url(image["url"]) for image in images],
             "poster_url": self.__fix_url(movie["poster"]["previewUrl"]),
             "banner_url": self.__fix_url(backdrop["url"]) if backdrop["url"] is not None else None,
-            "facts": [self.__get_spoilers(text=BeautifulSoup(fact["value"], "html.parser").text, names=[movie["name"], *names]) for fact in facts] if facts else [],
+            "facts": [self.get_spoilers(text=BeautifulSoup(fact["value"], "html.parser").text, names=[movie["name"], *names]) for fact in facts] if facts else [],
             "alternative_names": sorted(names),
             "sequels": []
         }
@@ -105,7 +105,7 @@ class KinopoiskParser:
 
         return filtered
 
-    def __get_spoilers(self, text: str, names: List[str]) -> dict:
+    def get_spoilers(self, text: str, names: List[str]) -> dict:
         text = self.__clear_spaces(text)
 
         names = sorted({name.lower() for name in names}, key=lambda name: -len(name))
@@ -131,7 +131,7 @@ class KinopoiskParser:
         return {"text": text, "spoilers": [{"start": start, "end": end} for start, end in sorted(spans)]}
 
     def __clear_spaces(self, text: str) -> str:
-        return re.sub(r"\s+", " ", text).strip()
+        return "\n".join(re.sub(r"\s+", " ", line).strip() for line in text.split("\n"))
 
     def __is_span_included(self, start: int, end: int, spans: Set[Tuple[int, int]]) -> bool:
         for span_start, span_end in spans:

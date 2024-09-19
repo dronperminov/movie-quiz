@@ -42,6 +42,12 @@ class HistoryAction:
         if name == RemovePersonAction.name:
             return RemovePersonAction(username=username, timestamp=timestamp, person_id=data["person_id"])
 
+        if name == AddCiteAction.name:
+            return AddCiteAction(username=username, timestamp=timestamp, cite_id=data["cite_id"])
+
+        if name == RemoveCiteAction.name:
+            return RemoveCiteAction(username=username, timestamp=timestamp, cite_id=data["cite_id"])
+
         raise ValueError(f'Invalid HistoryAction name "{name}"')
 
 
@@ -99,3 +105,21 @@ class RemovePersonAction(HistoryAction):
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), "person_id": self.person_id}
+
+
+@dataclass
+class AddCiteAction(HistoryAction):
+    name = "add_cite"
+    cite_id: int
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "cite_id": self.cite_id}
+
+
+@dataclass
+class RemoveCiteAction(HistoryAction):
+    name = "remove_cite"
+    cite_id: int
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "cite_id": self.cite_id}

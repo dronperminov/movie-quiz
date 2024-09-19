@@ -89,6 +89,7 @@ Movie.prototype.BuildPage = function(sequels = [], blockId = "movie") {
     this.BuildPagePersons(movie, "Режиссёр" + (this.directors.length > 1 ? "ы" : ""), this.directors)
     this.BuildPageFacts(movie)
     this.BuildSequels(movie, sequels)
+    this.BuildCites(movie)
     this.BuildAdmin(movie)
 }
 
@@ -151,6 +152,17 @@ Movie.prototype.BuildSequels = function(parent, sequels) {
         block.appendChild(sequel.Build())
         infos.Add(sequel.BuildInfo())
     }
+}
+
+Movie.prototype.BuildCites = function(parent) {
+    if (this.params.cites.length === 0)
+        return
+
+    MakeElement("movie-header", parent, {innerText: "Цитаты"})
+    let cites = MakeElement("movie-cites", parent)
+
+    for (let cite of this.params.cites)
+        MakeElement("movie-cite", cites, {innerHTML: this.GetSpoileredText(cite.text)})
 }
 
 Movie.prototype.BuildInfo = function() {
@@ -379,7 +391,7 @@ Movie.prototype.GetSpoileredText = function(text) {
     }
 
     spoilered.push(text.text.slice(start))
-    return spoilered.join("")
+    return spoilered.join("").replace(/\n/g, "<br>")
 }
 
 Movie.prototype.GetFirstLetter = function() {

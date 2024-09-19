@@ -7,7 +7,9 @@ from urllib.error import HTTPError, URLError
 import wget
 
 from src import Database
-from src.entities.history_action import AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction, RemoveMovieAction, RemovePersonAction
+from src.entities.cite import Cite
+from src.entities.history_action import AddCiteAction, AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction, RemoveCiteAction, RemoveMovieAction, \
+    RemovePersonAction
 from src.entities.metadata import Metadata
 from src.entities.movie import Movie
 from src.entities.person import Person
@@ -41,6 +43,15 @@ class MovieDatabase:
         person_ids = [actor.person_id for movie in movies for actor in movie.actors + movie.directors]
         persons = self.database.persons.find({"person_id": {"$in": person_ids}})
         return {person["person_id"]: Person.from_dict(person) for person in persons}
+
+    def get_movies_cites(self, movies: List[Movie]) -> Dict[int, List[Cite]]:
+        movie_ids = [movie.movie_id for movie in movies]
+        movie_id2cites = {movie_id: [] for movie_id in movie_ids}
+
+        for cite in self.database.cites.find({"movie_id": {"$in": movie_ids}}).sort({"cite_id": 1}):
+            movie_id2cites[cite["movie_id"]].append(Cite.from_dict(cite))
+
+        return movie_id2cites
 
     def get_last_movies(self, order_field: str, order_type: int, count: int) -> List[Movie]:
         _, movies = self.search_movies(MovieSearch(order_type=order_type, order=order_field, page_size=count, page=0))
@@ -239,6 +250,23 @@ class MovieDatabase:
             removed_persons += 1
 
         return removed_persons
+
+    def add_cite(self, cite: Cite, username: str) -> None:
+        assert self.database.movies.find_one({"movie_id": cite.movie_id}) is not None
+
+        action = AddCiteAction(username=username, timestamp=datetime.now(), cite_id=cite.cite_id)
+        self.database.cites.insert_one(cite.to_dict())
+        self.database.history.insert_one(action.to_dict())
+        self.logger.info(f"Added cite {cite.cite_id} for movie {cite.movie_id} by @{username}")
+
+    def remove_cite(self, cite_id: int, username: str) -> None:
+        cite = self.database.cites.find_one({"cite_id": cite_id}, {"movie_id": 1})
+        assert cite is not None
+
+        action = RemoveCiteAction(username=username, timestamp=datetime.now(), cite_id=cite_id)
+        self.database.cites.delete_one({"cite_id": cite_id})
+        self.database.history.insert_one(action.to_dict())
+        self.logger.info(f'Removed cite {cite_id} from movie {cite["movie_id"]}) by @{username}')
 
     def add_from_kinopoisk(self, movies: List[dict], username: str) -> Tuple[int, int]:
         movies_count = self.get_movies_count()

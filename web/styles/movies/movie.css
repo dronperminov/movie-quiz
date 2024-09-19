@@ -144,3 +144,19 @@
     max-height: 300px;
     overflow-y: auto;
 }
+
+.movie-cites {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 0.8em;
+    max-height: 220px;
+    overflow-y: auto
+}
+
+.movie-cite {
+    font-size: 0.95em;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    background-color: var(--block-background);
+    border: 1px solid var(--border-color);
+}

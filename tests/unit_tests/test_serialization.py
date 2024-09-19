@@ -3,7 +3,10 @@ from unittest import TestCase
 
 from src.entities.actor import Actor
 from src.entities.cite import Cite
-from src.entities.history_action import AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction, HistoryAction, RemoveMovieAction, RemovePersonAction
+from src.entities.history_action import \
+    AddCiteAction, AddMovieAction, AddPersonAction, \
+    EditMovieAction, EditPersonAction, HistoryAction, \
+    RemoveCiteAction, RemoveMovieAction, RemovePersonAction
 from src.entities.lyrics import Lyrics
 from src.entities.lyrics_line import LyricsLine
 from src.entities.metadata import Metadata
@@ -157,6 +160,8 @@ class TestSerialization(TestCase):
             AddPersonAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), person_id=1),
             EditPersonAction(username="user2", timestamp=datetime(2024, 1, 1, 20, 42, 12), person_id=1, diff={"name": "aba"}),
             RemovePersonAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), person_id=1),
+            AddCiteAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), cite_id=1),
+            RemoveCiteAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), cite_id=1)
         ]
 
         for history_action in history_actions:

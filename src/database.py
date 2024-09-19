@@ -64,7 +64,7 @@ class Database:
 
         self.cites = database["cites"]
         self.cites.create_index([("cite_id", ASCENDING)], unique=True)
-        self.cites.create_index([("movie_id", ASCENDING)], unique=True)
+        self.cites.create_index([("movie_id", ASCENDING)])
 
         self.history = database["history"]
         self.history.create_index([("username", ASCENDING)])

@@ -65,6 +65,7 @@ def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLRe
 
     sequels = movie_database.get_movies(movie_ids=movie.sequels)
     person_id2person = movie_database.get_movies_persons(movies=[movie, *sequels])
+    movie_id2cites = movie_database.get_movies_cites(movies=[movie])
     movie_id2scale = questions_database.get_movies_scales(user=user, movies=[movie, *sequels])
 
     template = templates.get_template("movies/movie.html")
@@ -73,6 +74,7 @@ def get_movie(movie_id: int, user: Optional[User] = Depends(get_user)) -> HTMLRe
         version=get_static_hash(),
         movie=jsonable_encoder(movie),
         person_id2person=jsonable_encoder(person_id2person),
+        cites=jsonable_encoder(movie_id2cites[movie.movie_id]),
         movie_id2scale=jsonable_encoder(movie_id2scale),
         sequels=jsonable_encoder(sequels)
     )
