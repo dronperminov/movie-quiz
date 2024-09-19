@@ -46,8 +46,8 @@ class KinopoiskParser:
         return sequels
 
     def __parse_movie(self, movie: dict, images: List[dict]) -> dict:
-        description = movie["description"] if movie["description"] else ""
-        short_description = movie["shortDescription"] if movie["shortDescription"] else ""
+        description = self.__clear_spaces(movie["description"]) if movie["description"] else ""
+        short_description = self.__clear_spaces(movie["shortDescription"]) if movie["shortDescription"] else ""
         countries = [country["name"] for country in movie["countries"]]
 
         rating = movie.get("rating", {"kp": 0, "imdb": 0})
@@ -55,19 +55,19 @@ class KinopoiskParser:
         backdrop = movie.get("backdrop", {"url": None})
         facts = movie.get("facts", [])
 
-        names = {name["name"] for name in movie.get("names", [])}
+        names = {self.__clear_spaces(name["name"]) for name in movie.get("names", [])}
         if movie.get("alternativeName", ""):
-            names.add(movie["alternativeName"])
+            names.add(self.__clear_spaces(movie["alternativeName"]))
 
         if movie.get("enName", ""):
-            names.add(movie["enName"])
+            names.add(self.__clear_spaces(movie["enName"]))
 
         return {
             "kinopoisk_id": movie["id"],
-            "name": movie["name"],
+            "name": self.__clear_spaces(movie["name"]),
             "movie_type": MovieType.from_kinopoisk(movie["type"]).value,
             "year": movie["year"],
-            "slogan": movie["slogan"] if movie["slogan"] else "",
+            "slogan": self.__clear_spaces(movie["slogan"]) if movie["slogan"] else "",
             "description": self.__get_spoilers(text=description, names=[movie["name"], *names]),
             "short_description": self.__get_spoilers(text=short_description, names=[movie["name"], *names]),
             "production": [production.value for production in Production.from_countries(countries=countries)],
@@ -106,10 +106,10 @@ class KinopoiskParser:
         return filtered
 
     def __get_spoilers(self, text: str, names: List[str]) -> dict:
-        text = re.sub(r"\s+", " ", text).strip()
+        text = self.__clear_spaces(text)
 
         names = sorted({name.lower() for name in names}, key=lambda name: -len(name))
-        escaped_names = [re.escape(re.sub(r"\s+", " ", name).strip()) for name in names]
+        escaped_names = [re.escape(self.__clear_spaces(name)) for name in names]
         spans = set()
 
         for match in re.finditer(r"|".join(rf"{name}" if " " in name else rf'"{name}"|«{name}»' for name in escaped_names), text.lower()):
@@ -129,6 +129,9 @@ class KinopoiskParser:
                 spans.add((start + 1, end - 1))
 
         return {"text": text, "spoilers": [{"start": start, "end": end} for start, end in sorted(spans)]}
+
+    def __clear_spaces(self, text: str) -> str:
+        return re.sub(r"\s+", " ", text).strip()
 
     def __is_span_included(self, start: int, end: int, spans: Set[Tuple[int, int]]) -> bool:
         for span_start, span_end in spans:
