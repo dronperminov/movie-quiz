@@ -1,0 +1,191 @@
+{% if user.username == show_user.username %}
+{% set title = "Аналитика | КМС квиз Плюшевой наковальни" %}
+{% else %}
+{% set title = "Аналитика пользователя @%s | КМС квиз Плюшевой наковальни" % show_user.username %}
+{% endif %}
+
+{% include "components/header.html" %}
+    <link rel="stylesheet" type="text/css" href="/styles/user/analytics.css?v={{version}}">
+</head>
+<body ondragstart="return false">
+    {% include "components/menu.html" %}
+    {% set main = analytics.main %}
+
+    <div class="content">
+        <h1>Аналитика</h1>
+
+        <div class="description">
+            Показана информация
+            {% if not period %}за всё время
+            {% elif period[0].date() == period[1].date() %}за {{period[0].strftime("%d.%m.%Y")}}
+            {% else %}с {{period[0].strftime("%d.%m.%Y")}} по {{period[1].strftime("%d.%m.%Y")}}
+            {% endif %}
+        </div>
+        <div class="analytics-period">
+            Показать за
+            <a class="link" href="/analytics?username={{show_user.username}}&period=today">сегодня</a>,
+            <a class="link" href="/analytics?username={{show_user.username}}&period=curr-month">текущий&nbsp;месяц</a>,
+            <a class="link" href="/analytics?username={{show_user.username}}&period=last-month">прошлый&nbsp;месяц</a>,
+            <a class="link" href="/analytics?username={{show_user.username}}&period=curr-year">текущий&nbsp;год</a>,
+            <a class="link" href="/analytics?username={{show_user.username}}">всё&nbsp;время</a>
+        </div>
+
+        <div class="profile">
+            <div class="profile-image">
+                <img src="{{show_user.avatar_url}}">
+                <div class="profile-rating">{{rating}}</div>
+            </div>
+        </div>
+
+        <div class="profile-name">{{show_user.full_name}}</div>
+
+        <h3>Общая статистика</h3>
+
+        {% if main.time.total > 0 %}
+        <div class="analytics-block">
+            <div>
+                <div class="analytics-total-value">{{format_time(main.time.total)}}</div>
+                <div class="analytics-description">Суммарное время, потребовавшееся на ответ</div>
+            </div>
+        </div>
+
+        <div class="analytics-block" id="questions-block">
+            <div class="analytics-title analytics-title-interactive" onclick="ToggleQuestionsChart()">Количество ответов</div>
+            <div class="analytics-description">Нажмите на показатель, чтобы увидеть диаграмму.</div>
+            <div class="analytics-items">
+                <div class="analytics-item analytics-item-interactive" onclick="ShowQuestionsChart()">
+                    <div class="analytics-item-value">{{main.questions.total}}</div>
+                    <div class="analytics-item-name"><b>всего</b></div>
+                </div>
+
+                <div class="analytics-item analytics-item-interactive" onclick="ShowQuestionsChart()">
+                    <div class="analytics-item-value">{{main.questions.correct_percents|round(1)}}%</div>
+                    <div class="analytics-item-name"><span class="circle correct-background"></span><b>верно</b>: {{main.questions.correct}}</div>
+                </div>
+
+                <div class="analytics-item analytics-item-interactive" onclick="ShowQuestionsChart()">
+                    <div class="analytics-item-value">{{main.questions.incorrect_percents|round(1)}}%</div>
+                    <div class="analytics-item-name"><span class="circle incorrect-background"></span><b>неверно</b>: {{main.questions.incorrect}}</div>
+                </div>
+            </div>
+            <div class="analytics-chart" id="questions-chart-block">
+                <svg id="questions-chart"></svg>
+            </div>
+        </div>
+
+        <div class="analytics-block" id="times-block">
+            <div class="analytics-title analytics-title-interactive" onclick="ToggleTimesChart()">Среднее время ответа</div>
+            <div class="analytics-description">Количество <b>секунд</b>, потребовавшихся на ответ в среднем. Нажмите на показатель, чтобы увидеть подробную диаграмму.</div>
+            <div class="analytics-items">
+                <div class="analytics-item analytics-item-interactive" onclick="ShowTimesChart('total')">
+                    <div class="analytics-item-value">{{main.time.total_mean|round(1)}}</div>
+                    <div class="analytics-item-name" id="times-total-label">всего</div>
+                </div>
+
+                <div class="analytics-item analytics-item-interactive" onclick="ShowTimesChart('correct')">
+                    <div class="analytics-item-value">{{main.time.correct_mean|round(1)}}</div>
+                    <div class="analytics-item-name" id="times-correct-label"><span class="circle correct-background"></span>верно</div>
+                </div>
+
+                <div class="analytics-item analytics-item-interactive" onclick="ShowTimesChart('incorrect')">
+                    <div class="analytics-item-value">{{main.time.incorrect_mean|round(1)}}</div>
+                    <div class="analytics-item-name" id="times-incorrect-label"><span class="circle incorrect-background"></span>неверно</div>
+                </div>
+            </div>
+            <div class="analytics-chart" id="times-chart-block">
+                <div class="analytics-chart-checkbox">
+                    <label class="switch-checkbox">
+                        <input type="checkbox" id="times-scale" onchange="ShowTimesChart()" checked>
+                        <span class="switch-checkbox-slider"></span>
+                    </label>
+                    <label for="times-scale">В одном масштабе</label>
+                </div>
+
+                <svg id="times-total-chart"></svg>
+                <svg class="hidden" id="times-correct-chart"></svg>
+                <svg class="hidden" id="times-incorrect-chart"></svg>
+            </div>
+        </div>
+
+        <div class="analytics-block">
+            <div class="analytics-title">Динамика</div>
+            <div class="analytics-description">В данном блоке отображаются результаты, сгруппированные по
+                {% if analytics.period.group_by == "hour" %}часам
+                {% elif analytics.period.group_by == "day" %}дням
+                {% elif analytics.period.group_by == "week" %}неделям
+                {% else %}месяцам
+                {% endif %}
+            </div>
+
+            <div class="analytics-subtitle analytics-title-interactive" onclick="TogglePeriodChart('time')">Среднее время ответа</div>
+            <div class="analytics-description">Нажмите, чтобы увидеть диаграмму.</div>
+            <div class="analytics-chart-period analytics-chart" id="period-time-block">
+                <svg id="period-time-chart"></svg>
+            </div>
+
+            <div class="analytics-subtitle analytics-title-interactive" onclick="TogglePeriodChart('questions')">Общее количество вопросов</div>
+            <div class="analytics-description">Нажмите, чтобы увидеть диаграмму.</div>
+            <div class="analytics-chart-period analytics-chart" id="period-questions-block">
+                <svg id="period-questions-chart"></svg>
+            </div>
+
+            <div class="analytics-subtitle analytics-title-interactive" onclick="TogglePeriodChart('correct')">Доля верных ответов (%)</div>
+            <div class="analytics-description">Нажмите, чтобы увидеть диаграмму.</div>
+            <div class="analytics-chart-period analytics-chart" id="period-correct-block">
+                <svg id="period-correct-chart"></svg>
+            </div>
+
+            <div class="analytics-subtitle analytics-title-interactive" onclick="TogglePeriodChart('incorrect')">Доля неверных ответов (%)</div>
+            <div class="analytics-description">Нажмите, чтобы увидеть диаграмму.</div>
+            <div class="analytics-chart-period analytics-chart" id="period-incorrect-block">
+                <svg id="period-incorrect-chart"></svg>
+            </div>
+        </div>
+        {% else %}
+        <div class="analytics-block">
+            <div class="analytics-no-info">Пока что нет информации</div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="/js/utils/fetch.js?v={{version}}"></script>
+
+    <script src="/js/charts/chart.js?v={{version}}"></script>
+    <script src="/js/charts/bar_chart.js?v={{version}}"></script>
+    <script src="/js/charts/plot_chart.js?v={{version}}"></script>
+
+    <script src="/js/user/analytics.js?v={{version}}"></script>
+
+    <script>
+        const questionsData = [
+            {value: {{main.questions.correct}}, color: key2color.correct},
+            {value: {{main.questions.incorrect}}, color: key2color.incorrect},
+        ]
+
+        const timesData = {
+            total: [{% for key in main.time.histogram_keys %}{label: "{{key}}", count: {{main.time.histogram[key]}} },{% endfor %}],
+            correct: [{% for key in main.time.histogram_keys %}{label: "{{key}}", count: {{main.time.histogram_correct[key]}} },{% endfor %}],
+            incorrect: [{% for key in main.time.histogram_keys %}{label: "{{key}}", count: {{main.time.histogram_incorrect[key]}} },{% endfor %}]
+        }
+
+        const periodData = [
+            {% for data in analytics.period.data %}
+            {
+                label: "{{data.label}}",
+                time: {{data.time|round(1)}},
+                correct: {{(data.correct / data.total * 100)|round(1)}},
+                incorrect: {{(data.incorrect / data.total * 100)|round(1)}},
+                questions: {{data.total}}
+            },
+            {% endfor %}
+        ]
+
+        PlotPeriodPlotChart("time", false)
+        PlotPeriodBarChart("questions")
+        PlotPeriodBarChart("correct", 100)
+        PlotPeriodBarChart("incorrect", 100)
+    </script>
+
+    {% include "components/footer.html" %}
+</body>
+</html>

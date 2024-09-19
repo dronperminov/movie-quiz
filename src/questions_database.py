@@ -1,11 +1,13 @@
 import logging
 import random
 from collections import defaultdict
-from typing import Dict, List, Optional
+from datetime import datetime
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
 from src.database import Database
+from src.entities.analytics import Analytics
 from src.entities.movie import Movie
 from src.entities.question import MovieByActorsQuestion, MovieByCharactersQuestion, MovieByDescriptionQuestion, MovieByImageQuestion, MovieBySloganQuestion, Question
 from src.entities.question_answer import QuestionAnswer
@@ -126,6 +128,14 @@ class QuestionsDatabase:
             movie_id2scale[movie_id]["scale"] = scales["correct"] / (scales["correct"] + scales["incorrect"])
 
         return movie_id2scale
+
+    def get_analytics(self, username: str, period: Optional[Tuple[datetime, datetime]]) -> Analytics:
+        query = {"username": username, "correct": {"$ne": None}}
+        if period:
+            query["timestamp"] = {"$gte": period[0], "$lte": period[1]}
+
+        questions = list(self.database.questions.find(query))
+        return Analytics.evaluate(questions)
 
     def update_question(self, question: Question, settings: QuestionSettings) -> Question:
         movie = self.movie_database.get_movie(movie_id=question.movie_id)
