@@ -36,6 +36,15 @@ class KinopoiskParser:
 
         return movie_id2images
 
+    def parse_sequels(self, movie_ids: List[int]) -> Dict[int, List[dict]]:
+        params = ["limit=250", "selectFields=id", "selectFields=sequelsAndPrequels", *[f"id={movie_id}" for movie_id in movie_ids]]
+        movies = self.__list_request(url=f'/v1.4/movie?{"&".join(params)}', target="sequels")
+        sequels = {movie_id: [] for movie_id in movie_ids}
+
+        for movie in movies:
+            sequels[movie["id"]] = movie.get("sequelsAndPrequels", [])
+        return sequels
+
     def __parse_movie(self, movie: dict, images: List[dict]) -> dict:
         description = movie["description"] if movie["description"] else ""
         short_description = movie["shortDescription"] if movie["shortDescription"] else ""

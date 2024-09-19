@@ -2,6 +2,7 @@
 {% include "components/header.html" %}
     <link rel="stylesheet" type="text/css" href="/styles/utils/info_panels.css?v={{version}}">
     <link rel="stylesheet" type="text/css" href="/styles/utils/history.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/movies/movies.css?v={{version}}">
     <link rel="stylesheet" type="text/css" href="/styles/movies/movie.css?v={{version}}">
 </head>
 <body ondragstart="return false">
@@ -27,7 +28,7 @@
     <script>
         let infos = new InfoPanels()
         let movie = new Movie({{movie|tojson}}, {personId2person: {{person_id2person|tojson}}, movieId2scale: {{movie_id2scale|tojson}}})
-        movie.BuildPage()
+        movie.BuildPage({{sequels|tojson}})
     </script>
     {% include "components/footer.html" %}
 </body>

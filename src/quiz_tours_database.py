@@ -3,7 +3,7 @@ import random
 import re
 from collections import defaultdict
 from datetime import date, datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 from rapidfuzz import fuzz
 
@@ -154,7 +154,7 @@ class QuizToursDatabase:
         last_questions = self.__get_last_questions(movie_ids=[movie["movie_id"] for movie in movies])
 
         if quiz_tour_type == QuizTourType.REGULAR:
-            questions = self.__generate_regular_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
+            questions = self.__generate_tour_questions_from_movies(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
         elif quiz_tour_type == QuizTourType.ALPHABET:
             questions = self.__generate_alphabet_tour_questions(movies=movies, last_questions=last_questions, settings=settings, count=questions_count)
         elif quiz_tour_type == QuizTourType.STAIRS:
@@ -186,19 +186,6 @@ class QuizToursDatabase:
         self.database.quiz_tours.insert_one(quiz_tour.to_dict())
         return quiz_tour
 
-    def __generate_regular_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
-        questions = []
-        sampled_names = []
-
-        for _ in range(count):
-            movie = self.questions_database.sample_question_movies(movies=movies, last_questions=last_questions, settings=settings, count=1)[0]
-            question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
-            questions.append(question)
-            last_questions.append(question)
-            movies = self.__exclude_similar_movies(sampled_names=sampled_names, sampled_movie=movie, movies=movies)
-
-        return questions
-
     def __generate_alphabet_tour_questions(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
         letter2position = {
             "а": 1, "a": 1, "б": 2, "b": 2, "в": 3, "c": 3, "г": 4, "d": 4, "д": 5, "e": 5, "е": 6, "f": 6, "ё": 7, "g": 7, "ж": 8, "h": 8,
@@ -212,6 +199,7 @@ class QuizToursDatabase:
 
         questions = []
         sampled_letters = set()
+        sampled_movies = set()
 
         for _ in range(count):
             movie = self.questions_database.sample_question_movies(movies=movies, last_questions=last_questions, settings=settings, count=1)[0]
@@ -221,6 +209,7 @@ class QuizToursDatabase:
 
             sampled_letters.add(movie_id2letter[movie.movie_id])
             movies = [movie for movie in movies if movie_id2letter[movie["movie_id"]] not in sampled_letters]
+            movies = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=movies)
 
         return sorted(questions, key=lambda question: letter2position.get(movie_id2letter[question.movie_id], 100))
 
@@ -233,12 +222,14 @@ class QuizToursDatabase:
         min_length = min(len2movies)
         start_len = random.randint(min_length, min_length + 3)
         questions = []
+        sampled_movies = set()
 
         for i in range(count):
             movie = self.questions_database.sample_question_movies(movies=len2movies[start_len + i], last_questions=last_questions, settings=settings, count=1)[0]
             question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
             questions.append(question)
             last_questions.append(question)
+            len2movies[start_len + i + 1] = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=len2movies[start_len + i + 1])
 
         return questions
 
@@ -282,7 +273,7 @@ class QuizToursDatabase:
         start_letter = random.choices(letters, weights=[len(letter2movies[letter]) for letter in letters], k=1)[0]
 
         questions = []
-        sampled_names = []
+        sampled_movies = set()
 
         for _ in range(count):
             movie = self.questions_database.sample_question_movies(movies=letter2movies[start_letter], last_questions=last_questions, settings=settings, count=1)[0]
@@ -291,26 +282,27 @@ class QuizToursDatabase:
             last_questions.append(question)
 
             start_letter = movie_id2end_letter[movie.movie_id]
-            letter2movies[start_letter] = self.__exclude_similar_movies(sampled_names=sampled_names, sampled_movie=movie, movies=letter2movies[start_letter])
+            letter2movies[start_letter] = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=letter2movies[start_letter])
 
         return questions
 
     def __generate_tour_questions_from_movies(self, movies: List[dict], last_questions: List[Question], settings: QuestionSettings, count: int) -> List[Question]:
         questions = []
-        sampled_names = []
+        sampled_movies = set()
 
         for _ in range(count):
             movie = self.questions_database.sample_question_movies(movies=movies, last_questions=last_questions, settings=settings, count=1)[0]
             question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
             questions.append(question)
             last_questions.append(question)
-            movies = self.__exclude_similar_movies(sampled_names=sampled_names, sampled_movie=movie, movies=movies)
+            movies = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=movies)
 
         return questions
 
-    def __exclude_similar_movies(self, sampled_names: List[str], sampled_movie: Movie, movies: List[dict]) -> List[dict]:
-        sampled_names.append(self.__preprocess_name(sampled_movie.name))
-        return [movie for movie in movies if not self.__is_similar_movie(movie["name"], sampled_names)]
+    def __exclude_similar_movies(self, sampled_movies: Set[int], sampled_movie: Movie, movies: List[dict]) -> List[dict]:
+        sampled_movies.add(sampled_movie.movie_id)
+        sampled_movies.update(sampled_movie.sequels)
+        return [movie for movie in movies if movie["movie_id"] not in sampled_movies]
 
     def __preprocess_name(self, name: str) -> str:
         return re.sub(r"\W+", " ", name)

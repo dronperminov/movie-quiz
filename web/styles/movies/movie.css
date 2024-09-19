@@ -139,3 +139,8 @@
     background-color: var(--block-background);
     border: 1px solid var(--border-color);
 }
+
+.movie-sequels {
+    max-height: 300px;
+    overflow-y: auto;
+}

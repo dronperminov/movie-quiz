@@ -34,6 +34,7 @@ class Movie:
     cites: List[int]
     tracks: List[int]
     alternative_names: List[str]
+    sequels: List[int]
     metadata: Metadata
 
     def to_dict(self) -> dict:
@@ -60,6 +61,7 @@ class Movie:
             "cites": self.cites,
             "tracks": self.tracks,
             "alternative_names": self.alternative_names,
+            "sequels": self.sequels,
             "metadata": self.metadata.to_dict()
         }
 
@@ -88,6 +90,7 @@ class Movie:
             cites=data["cites"],
             tracks=data["tracks"],
             alternative_names=data["alternative_names"],
+            sequels=data["sequels"],
             metadata=Metadata.from_dict(data["metadata"])
         )
 
@@ -96,8 +99,8 @@ class Movie:
         diff = {}
 
         fields = [
-            "name", "movie_type", "year", "slogan", "description", "short_description", "production", "countries", "genres", "actors",
-            "directors", "duration", "rating", "image_urls", "poster_url", "banner_url", "facts", "cites", "tracks", "alternative_names"
+            "name", "movie_type", "year", "slogan", "description", "short_description", "production", "countries", "genres", "actors", "directors",
+            "duration", "rating", "image_urls", "poster_url", "banner_url", "facts", "cites", "tracks", "alternative_names", "sequels"
         ]
 
         for field in fields:

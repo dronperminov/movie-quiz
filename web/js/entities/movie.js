@@ -56,7 +56,7 @@ Movie.prototype.Build = function() {
     return movie
 }
 
-Movie.prototype.BuildPage = function(blockId = "movie") {
+Movie.prototype.BuildPage = function(sequels = [], blockId = "movie") {
     let movie = document.getElementById(blockId)
 
     let movieImage = MakeElement("movie-image", movie)
@@ -88,6 +88,7 @@ Movie.prototype.BuildPage = function(blockId = "movie") {
     this.BuildPagePersons(movie, "Актёры", this.actors)
     this.BuildPagePersons(movie, "Режиссёр" + (this.directors.length > 1 ? "ы" : ""), this.directors)
     this.BuildPageFacts(movie)
+    this.BuildSequels(movie, sequels)
     this.BuildAdmin(movie)
 }
 
@@ -136,6 +137,20 @@ Movie.prototype.BuildPageFacts = function(parent) {
 
     for (let fact of this.facts)
         MakeElement("movie-fact", facts, {innerHTML: this.GetSpoileredText(fact)})
+}
+
+Movie.prototype.BuildSequels = function(parent, sequels) {
+    if (sequels.length === 0)
+        return
+
+    MakeElement("movie-header", parent, {innerText: "Сиквелы и приквелы"})
+    let block = MakeElement("movie-sequels", parent)
+
+    for (let sequel of sequels) {
+        sequel = new Movie(sequel, this.params)
+        block.appendChild(sequel.Build())
+        infos.Add(sequel.BuildInfo())
+    }
 }
 
 Movie.prototype.BuildInfo = function() {
