@@ -102,9 +102,12 @@ class QuizToursDatabase:
 
     def get_quiz_tour_movie_results(self, username: str, quiz_tour: QuizTour) -> Dict[int, bool]:
         questions = self.database.quiz_tour_questions.find({"question_id": {"$in": quiz_tour.question_ids}}, {"question.movie_id": 1, "question_id": 1})
+        question_id2question = {question["question_id"]: question for question in questions}
+
         answers = self.database.quiz_tour_answers.find({"username": username, "question_id": {"$in": quiz_tour.question_ids}})
         question_id2answer = {answer["question_id"]: answer["correct"] for answer in answers}
-        return {question["question"]["movie_id"]: question_id2answer[question["question_id"]] for question in questions}
+
+        return {question_id2question[question_id]["question"]["movie_id"]: question_id2answer[question_id] for question_id in quiz_tour.question_ids}
 
     def is_tour_ended(self, username: str, quiz_tour: QuizTour) -> bool:
         return self.database.quiz_tour_answers.count_documents({"username": username, "question_id": {"$in": quiz_tour.question_ids}}) == len(quiz_tour.question_ids)
@@ -170,7 +173,7 @@ class QuizToursDatabase:
         else:
             raise ValueError(f'Invalid quiz tour type "{quiz_tour_type}"')
 
-        quiz_tour_questions = self.__convert_to_quiz_tour_questions(questions=questions)
+        quiz_tour_questions = self.convert_to_quiz_tour_questions(questions=questions)
         quiz_tour = QuizTour(
             quiz_tour_id=self.database.get_identifier("quiz_tours"),
             quiz_tour_type=quiz_tour_type,
@@ -209,7 +212,7 @@ class QuizToursDatabase:
 
             sampled_letters.add(movie_id2letter[movie.movie_id])
             movies = [movie for movie in movies if movie_id2letter[movie["movie_id"]] not in sampled_letters]
-            movies = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=movies)
+            movies = self.exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=movies)
 
         return sorted(questions, key=lambda question: letter2position.get(movie_id2letter[question.movie_id], 100))
 
@@ -229,7 +232,7 @@ class QuizToursDatabase:
             question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
             questions.append(question)
             last_questions.append(question)
-            len2movies[start_len + i + 1] = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=len2movies[start_len + i + 1])
+            len2movies[start_len + i + 1] = self.exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=len2movies[start_len + i + 1])
 
         return questions
 
@@ -282,7 +285,7 @@ class QuizToursDatabase:
             last_questions.append(question)
 
             start_letter = movie_id2end_letter[movie.movie_id]
-            letter2movies[start_letter] = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=letter2movies[start_letter])
+            letter2movies[start_letter] = self.exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=letter2movies[start_letter])
 
         return questions
 
@@ -295,11 +298,11 @@ class QuizToursDatabase:
             question = self.questions_database.generate_question(movie=movie, username="", settings=settings)
             questions.append(question)
             last_questions.append(question)
-            movies = self.__exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=movies)
+            movies = self.exclude_similar_movies(sampled_movies=sampled_movies, sampled_movie=movie, movies=movies)
 
         return questions
 
-    def __exclude_similar_movies(self, sampled_movies: Set[int], sampled_movie: Movie, movies: List[dict]) -> List[dict]:
+    def exclude_similar_movies(self, sampled_movies: Set[int], sampled_movie: Movie, movies: List[dict]) -> List[dict]:
         sampled_movies.add(sampled_movie.movie_id)
         sampled_movies.update(sampled_movie.sequels)
         return [movie for movie in movies if movie["movie_id"] not in sampled_movies]
@@ -322,7 +325,7 @@ class QuizToursDatabase:
         last_questions = self.database.quiz_tour_questions.find({"question.movie_id": {"$in": movie_ids}}).sort("question_id", -1).limit(self.last_questions_count)
         return [Question.from_dict(question["question"]) for question in last_questions]
 
-    def __convert_to_quiz_tour_questions(self, questions: List[Question], answer_time: float = 45) -> List[QuizTourQuestion]:
+    def convert_to_quiz_tour_questions(self, questions: List[Question], answer_time: float = 45) -> List[QuizTourQuestion]:
         quiz_tour_questions = []
 
         for question in questions:

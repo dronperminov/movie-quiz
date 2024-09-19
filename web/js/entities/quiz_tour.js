@@ -77,7 +77,9 @@ QuizTour.prototype.TagToRus = function(tag) {
         "series": "сериалы",
         "movie": "фильмы",
         "anime": "аниме",
-        "mcs": "КМС"
+        "mcs": "КМС",
+        "actor": "по актёру",
+        "director": "по режиссёру"
     }
 
     return tag2rus[tag]
