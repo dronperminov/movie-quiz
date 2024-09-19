@@ -160,3 +160,9 @@
     background-color: var(--block-background);
     border: 1px solid var(--border-color);
 }
+
+.movie-tracks {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 0.8em;
+}

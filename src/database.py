@@ -60,7 +60,7 @@ class Database:
 
         self.tracks = database["tracks"]
         self.tracks.create_index([("track_id", ASCENDING)], unique=True)
-        self.tracks.create_index([("movie_id", ASCENDING)], unique=True)
+        self.tracks.create_index([("movie_id", ASCENDING)])
 
         self.cites = database["cites"]
         self.cites.create_index([("cite_id", ASCENDING)], unique=True)

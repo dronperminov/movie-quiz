@@ -48,6 +48,12 @@ class HistoryAction:
         if name == RemoveCiteAction.name:
             return RemoveCiteAction(username=username, timestamp=timestamp, cite_id=data["cite_id"])
 
+        if name == AddTrackAction.name:
+            return AddTrackAction(username=username, timestamp=timestamp, track_id=data["track_id"])
+
+        if name == RemoveTrackAction.name:
+            return RemoveTrackAction(username=username, timestamp=timestamp, track_id=data["track_id"])
+
         raise ValueError(f'Invalid HistoryAction name "{name}"')
 
 
@@ -123,3 +129,21 @@ class RemoveCiteAction(HistoryAction):
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), "cite_id": self.cite_id}
+
+
+@dataclass
+class AddTrackAction(HistoryAction):
+    name = "add_track"
+    track_id: int
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "track_id": self.track_id}
+
+
+@dataclass
+class RemoveTrackAction(HistoryAction):
+    name = "remove_track"
+    track_id: int
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "track_id": self.track_id}

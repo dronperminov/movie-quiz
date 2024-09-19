@@ -1,0 +1,181 @@
+.track {
+    background: var(--block-background);
+    padding: 5px;
+    border-radius: 1em;
+}
+
+.track-main {
+    display: grid;
+    grid-template-columns: 5em 1fr 1.5em 5px;
+    grid-gap: 0.5em;
+}
+
+.track-image {
+    position: relative;
+}
+
+.track-image img {
+    padding: 2px;
+    width: 100%;
+    border-radius: 1.1em;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+.track-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 0.4em;
+    margin-bottom: 0.2em;
+}
+
+.track-title a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.track-title a:hover {
+    color: var(--main-color);
+}
+
+.track-image-lyrics {
+    position: absolute;
+    right: -0.1em;
+    bottom: -0.1em;
+    background: var(--block-background);
+    border-radius: 0.8em;
+    font-size: 0.45em;
+    font-weight: bold;
+    padding: 0.3em 0.55em 0.2em 0.55em;
+    display: inline-grid;
+    align-content: center;
+    justify-content: center;
+}
+
+.track-artists {
+    font-size: 0.75em;
+    color: var(--subtext-color);
+    line-height: 1.5em;
+}
+
+.track-controls {
+    display: grid;
+    align-content: center;
+    justify-content: center;
+}
+
+.track-controls svg {
+    fill: var(--text-color);
+    cursor: pointer;
+}
+
+.track-controls svg:hover {
+    fill: var(--main-color);
+}
+
+.track-controls .loader img {
+    width: 30px;
+    height: 30px;
+}
+
+.track-menu {
+    display: grid;
+    align-content: center;
+    justify-content: end;
+    padding-right: 0.4em;
+}
+
+.track-lyrics {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.track-lyrics-line {
+    font-size: 0.9em;
+    line-height: 1.4em;
+}
+
+.track .lyrics-updater {
+    margin-top: 1em;
+}
+
+.track-info {
+    margin-top: 1em;
+}
+
+.track-question {
+    background-color: unset !important;
+    position: relative;
+}
+
+.track-question .track-main {
+    display: block;
+    text-align: center;
+}
+
+.track-question .track-image {
+    max-width: 200px;
+    margin: 0 auto 1em auto;
+    position: relative;
+}
+
+.track-question .track-artists {
+    margin-bottom: 1em;
+}
+
+.track-question .track-menu {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.track-unknown .track-menu {
+    display: none;
+}
+
+.track-question .track-controls {
+    margin-bottom: 1em;
+}
+
+.track-tip {
+    display: none;
+}
+
+.track-unknown .track-tip {
+    background: #ffffffd0;
+    color: var(--main-color);
+
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    border-radius: 1.1em;
+    pointer-events: none;
+
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1;
+}
+
+.track-tip .track-tip-letter {
+    font-size: 600%;
+    font-weight: bold;
+}
+
+.track-tip .track-tip-letter-language {
+    font-size: 1.5em;
+}
+
+.track-unknown .track-tip ~ img {
+    filter: blur(6px);
+}
+
+.markup-lyrics {
+    margin-top: 1em;
+}
+
+.markup-lyrics .admin-block {
+    margin: 1.3em 0;
+}

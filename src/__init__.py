@@ -8,7 +8,7 @@ from src.movie_database import MovieDatabase
 from src.questions_database import QuestionsDatabase
 from src.quiz_tours_database import QuizToursDatabase
 from src.utils.kinopoisk_parser import KinopoiskParser
-
+from src.utils.yandex_music_parser import YandexMusicParser
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger()
@@ -19,8 +19,10 @@ if os.path.exists(secrets_path):
     with open(secrets_path, "r") as f:
         secrets = json.load(f)
     kinopoisk_parser = KinopoiskParser(tokens=secrets["kinopoisk_tokens"], logger=logger)
+    yandex_music_parser = YandexMusicParser(token=secrets["yandex_token"])
 else:
     kinopoisk_parser = None
+    yandex_music_parser = None
 
 database = Database(mongo_url="mongodb://localhost:27017/", database_name="movie_quiz_db")
 movie_database = MovieDatabase(database=database, kinopoisk_parser=kinopoisk_parser, logger=logger)

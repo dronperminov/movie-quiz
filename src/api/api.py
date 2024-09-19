@@ -4,10 +4,11 @@ from fastapi import APIRouter, Depends
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from src import database, kinopoisk_parser, movie_database, quiz_tours_database
+from src import database, kinopoisk_parser, movie_database, quiz_tours_database, yandex_music_parser
 from src.api import templates
 from src.entities.user import User
 from src.enums import UserRole
+from src.query_params.direct_link import DirectLink
 from src.query_params.history_query import HistoryQuery
 from src.query_params.movie_parse import MovieParse
 from src.query_params.top_players_query import TopPlayersQuery
@@ -60,3 +61,13 @@ def get_history(params: HistoryQuery) -> JSONResponse:
 def get_top_players(params: TopPlayersQuery) -> JSONResponse:
     players = quiz_tours_database.get_top_players(params.to_query())
     return JSONResponse({"status": "success", "players": jsonable_encoder(players)})
+
+
+@router.post("/get-direct-link")
+def get_direct_link(params: DirectLink) -> JSONResponse:
+    direct_link = yandex_music_parser.get_track_link(params.yandex_id)
+
+    if not direct_link:
+        return JSONResponse({"status": "error", "message": "Не удалось получить ссылку на аудио"})
+
+    return JSONResponse({"status": "success", "direct_link": direct_link})

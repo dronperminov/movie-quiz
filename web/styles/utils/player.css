@@ -1,0 +1,122 @@
+.player {
+    display: table;
+    padding-top: 3px;
+}
+
+.player-icons {
+    display: grid;
+    grid-auto-flow: column;
+    grid-gap: 0.8em;
+    align-items: center;
+    padding-right: 0.5em;
+}
+
+.player-icon {
+    cursor: pointer;
+}
+
+.player-icon svg {
+    fill: var(--player-icon-color);
+}
+
+.player-icon:hover svg, .player-icon-pressed svg {
+    fill: var(--player-progress-current-color);
+}
+
+.player-progress {
+    display: table-cell;
+    width: 100%;
+    vertical-align: middle;
+}
+
+.player-time {
+    display: table-cell;
+    width: 0;
+    white-space: nowrap;
+    font-size: 0.75em;
+    padding-left: 0.5em;
+    vertical-align: middle;
+    color: var(--player-time-color);
+}
+
+.player-volume {
+    display: table-cell;
+    vertical-align: middle;
+    padding-left: 0.5em;
+    position: relative;
+}
+
+.player-volume-input {
+    position: absolute;
+    left: -0.75em;
+    right: -1em;
+    margin: 0 auto;
+    height: 80px;
+    bottom: 2em;
+}
+
+.player-volume-input-bar {
+    border-radius: 5px;
+    width: 5px;
+    height: 100%;
+    background: var(--player-progress-bar-color);
+    position: relative;
+    margin: 0 auto;
+    pointer-events: none;
+}
+
+.player-volume-input-current {
+    background-color: var(--player-progress-current-color);
+    border-radius: 5px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.player-volume-input:hover .player-volume-input-current:after {
+    content: "";
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 100%;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--player-progress-current-color);
+}
+
+.player-progress-bar {
+    border-radius: 5px;
+    height: 5px;
+    background: var(--player-progress-bar-color);
+    position: relative;
+    cursor: pointer;
+}
+
+.player-progress-current {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    background: var(--player-progress-current-color);
+    width: 0;
+    border-radius: 5px;
+}
+
+.player-progress:hover .player-progress-current:after {
+    content: "";
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 100%;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--player-progress-current-color);
+}
+
+.player-showed-lyrics {
+    fill: var(--player-progress-current-color) !important;
+}

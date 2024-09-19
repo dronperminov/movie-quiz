@@ -8,14 +8,15 @@ import wget
 
 from src import Database
 from src.entities.cite import Cite
-from src.entities.history_action import AddCiteAction, AddMovieAction, AddPersonAction, EditMovieAction, EditPersonAction, RemoveCiteAction, RemoveMovieAction, \
-    RemovePersonAction
+from src.entities.history_action import AddCiteAction, AddMovieAction, AddPersonAction, AddTrackAction, EditMovieAction, EditPersonAction, RemoveCiteAction, \
+    RemoveMovieAction, RemovePersonAction, RemoveTrackAction
 from src.entities.metadata import Metadata
 from src.entities.movie import Movie
 from src.entities.person import Person
 from src.entities.quiz_tour import QuizTour
 from src.entities.session import Session
 from src.entities.source import KinopoiskSource
+from src.entities.track import Track
 from src.query_params.movie_search import MovieSearch
 from src.query_params.person_movies import PersonMovies
 from src.utils.images import resize_image
@@ -52,6 +53,15 @@ class MovieDatabase:
             movie_id2cites[cite["movie_id"]].append(Cite.from_dict(cite))
 
         return movie_id2cites
+
+    def get_movies_tracks(self, movies: List[Movie]) -> Dict[int, List[Track]]:
+        movie_ids = [movie.movie_id for movie in movies]
+        movie_id2tracks = {movie_id: [] for movie_id in movie_ids}
+
+        for track in self.database.tracks.find({"movie_id": {"$in": movie_ids}}).sort({"track_id": 1}):
+            movie_id2tracks[track["movie_id"]].append(Track.from_dict(track))
+
+        return movie_id2tracks
 
     def get_last_movies(self, order_field: str, order_type: int, count: int) -> List[Movie]:
         _, movies = self.search_movies(MovieSearch(order_type=order_type, order=order_field, page_size=count, page=0))
@@ -270,6 +280,26 @@ class MovieDatabase:
         self.database.cites.delete_one({"cite_id": cite_id})
         self.database.history.insert_one(action.to_dict())
         self.logger.info(f'Removed cite {cite_id} from movie {cite["movie_id"]}) by @{username}')
+
+    def add_track(self, track: Track, username: str) -> None:
+        movie = self.get_movie(movie_id=track.movie_id)
+        assert movie is not None
+
+        action = AddTrackAction(username=username, timestamp=datetime.now(), track_id=track.track_id)
+        self.database.tracks.insert_one(track.to_dict())
+        self.database.history.insert_one(action.to_dict())
+        self.logger.info(f"Added track {track.track_id} for movie {track.movie_id} by @{username}")
+
+        self.update_movie(movie_id=movie.movie_id, diff=movie.get_diff({"tracks": [track_id for track_id in movie.tracks] + [track.track_id]}), username=username)
+
+    def remove_track(self, track_id: int, username: str) -> None:
+        track = self.database.tracks.find_one({"track_id": track_id}, {"movie_id": 1})
+        assert track is not None
+
+        action = RemoveTrackAction(username=username, timestamp=datetime.now(), track_id=track_id)
+        self.database.tracks.delete_one({"track_id": track_id})
+        self.database.history.insert_one(action.to_dict())
+        self.logger.info(f'Removed track {track_id} from movie {track["movie_id"]}) by @{username}')
 
     def add_from_kinopoisk(self, movies: List[dict], username: str) -> Tuple[int, int]:
         movies_count = self.get_movies_count()

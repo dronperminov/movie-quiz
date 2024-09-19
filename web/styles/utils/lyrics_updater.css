@@ -1,0 +1,42 @@
+.lyrics-updater {
+    background-color: var(--block-background);
+    border: 1px solid var(--border-color);
+    border-radius: 0.8em;
+    padding: 0.5em 0;
+}
+
+.lyrics-updater .lyrics-lines {
+    display: grid;
+    grid-auto-flow: row;
+    grid-gap: 10px;
+
+    padding: 0 0.8em;
+    min-height: 9em;
+    height: 10em;
+    overflow-y: auto;
+    resize: vertical;
+}
+
+.lyrics-updater .lyrics-line {
+    font-size: 1em;
+    color: var(--subtext-color);
+    cursor: pointer;
+}
+
+.lyrics-updater .lyrics-line:hover {
+    color: var(--text-color);
+}
+
+.lyrics-updater .lyrics-line-curr {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.lyrics-updater-disabled .lyrics-line-chorus, .lyrics-updater .lyrics-line-chorus {
+    color: var(--main-color) !important;
+}
+
+.lyrics-updater-disabled .lyrics-line, .lyrics-updater-disabled .lyrics-line:hover {
+    color: var(--subtext-color);
+    cursor: default;
+}

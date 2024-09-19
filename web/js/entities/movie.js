@@ -90,6 +90,7 @@ Movie.prototype.BuildPage = function(sequels = [], blockId = "movie") {
     this.BuildPageFacts(movie)
     this.BuildSequels(movie, sequels)
     this.BuildCites(movie)
+    this.BuildTracks(movie)
     this.BuildAdmin(movie)
 }
 
@@ -163,6 +164,19 @@ Movie.prototype.BuildCites = function(parent) {
 
     for (let cite of this.params.cites)
         MakeElement("movie-cite", cites, {innerHTML: this.GetSpoileredText(cite.text)})
+}
+
+Movie.prototype.BuildTracks = function(parent) {
+    if (this.params.tracks.length === 0)
+        return
+
+    MakeElement("movie-header", parent, {innerText: "Треки"})
+    let tracks = MakeElement("movie-tracks", parent)
+
+    for (let track of this.params.tracks) {
+        track = new Track(track)
+        tracks.appendChild(track.Build())
+    }
 }
 
 Movie.prototype.BuildInfo = function() {
