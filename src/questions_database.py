@@ -43,16 +43,18 @@ class QuestionsDatabase:
         if not movies:
             return None
 
+        movie_ids = {movie["movie_id"] for movie in movies}
+
         if external_questions is None and (question := self.__get_user_question(username=settings.username)):
-            if question.is_valid({movie["movie_id"] for movie in movies}, settings.question_settings):
+            if question.is_valid(movie_ids=movie_ids, settings=settings.question_settings):
                 return self.update_question(question, settings.question_settings)
 
             self.database.questions.delete_one({"username": settings.username, "correct": None})
 
         if external_questions:
-            last_questions = external_questions
+            last_questions = [question for question in external_questions if question.movie_id in movie_ids]
         else:
-            last_questions = self.__get_last_questions(username=settings.username, movie_ids=[movie["movie_id"] for movie in movies])
+            last_questions = self.__get_last_questions(username=settings.username, movie_ids=list(movie_ids))
 
         last_incorrect_questions = [question for question in last_questions if not question.correct and question.question_type in settings.question_settings.question_types]
 
