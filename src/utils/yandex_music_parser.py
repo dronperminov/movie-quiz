@@ -23,6 +23,10 @@ class YandexMusicParser:
         except NotFoundError:
             return None
 
+    def parse_album(self, album_id: str) -> List[dict]:
+        album = self.__request(func=lambda: self.client.albums_with_tracks(album_id))
+        return [self.__process_track(track) for volume in album.volumes for track in volume]
+
     def get_track_link(self, track_id: str, bitrate: int = 192) -> Optional[str]:
         try:
             info = self.__request(func=lambda: self.client.tracks([track_id])[0].get_specific_download_info("mp3", bitrate))

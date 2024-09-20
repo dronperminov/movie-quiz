@@ -16,12 +16,14 @@ class MovieSearch:
     years: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
     votes: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
     rating: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
+    tracks: str = "any"
     page: int = 0
     page_size: int = 20
 
     def to_query(self) -> dict:
         query = {
             **self.__to_name_query(),
+            **self.__to_tracks_query(),
             **enum_query("movie_type", self.movie_type),
             **enum_query("production", self.production),
             **interval_query("year", self.years),
@@ -45,3 +47,12 @@ class MovieSearch:
             return {"name": {"$regex": fr"{re.escape(self.query[:-1])}$", "$options": "i"}}
 
         return {"name": {"$regex": re.escape(self.query), "$options": "i"}}
+
+    def __to_tracks_query(self) -> dict:
+        if self.tracks == "without":
+            return {"tracks": []}
+
+        if self.tracks == "with":
+            return {"tracks": {"$ne": []}}
+
+        return {}

@@ -56,7 +56,7 @@ function AddMovies(buttons) {
 }
 
 function AddTrack(movieId, buttons) {
-    let urlRegex = /^https:\/\/music\.yandex\.ru\/(album\/\d+\/)?track\/(?<trackId>\d+)/g
+    let urlRegex = /^.*https:\/\/music\.yandex\.ru\/(album\/\d+\/)?track\/(?<trackId>\d+)/g
     let urlInput = new TextInput("track-url", urlRegex, "Введена некорректная ссылка", true)
     let urls = urlInput.GetValue()
     if (urls === null)

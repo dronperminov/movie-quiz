@@ -129,6 +129,18 @@
 
                 <div class="search-filter-line"></div>
 
+                <div class="search-filter">
+                    <label>Треки:
+                        <select class="basic-select" id="tracks">
+                            <option value="any">не важно</option>
+                            <option value="with">есть</option>
+                            <option value="without">нет</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="search-filter-line"></div>
+
                 <div class="search-filter-button">
                     <button class="basic-button gradient-button" onclick="search.Search()">Искать</button>
                 </div>
@@ -221,6 +233,7 @@
         document.getElementById("query").value = {{search_params.query|tojson}}
         document.getElementById("order").value = {{search_params.order|tojson}}
         document.getElementById("order-type").value = {{search_params.order_type|tojson}}
+        document.getElementById("tracks").value = {{search_params.tracks|tojson}}
         SearchMovies()
         {% endif %}
 

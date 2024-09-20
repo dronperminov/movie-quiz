@@ -19,7 +19,8 @@ function GetSearchParams() {
         production: productionInput.GetValue(),
         years: years,
         votes: votes,
-        rating: rating
+        rating: rating,
+        tracks: document.getElementById("tracks").value
     }
 }
 
@@ -54,7 +55,7 @@ function PushUrlParams(params = null) {
         if (params.query !== "")
             url.searchParams.set("query", params.query)
 
-        for (let key of ["order", "order_type"])
+        for (let key of ["order", "order_type", "tracks"])
             url.searchParams.set(key, params[key])
 
         for (let key of ["years"])
@@ -96,10 +97,12 @@ function SearchShortMovies(order, orderType) {
     let queryInput = document.getElementById("query")
     let orderInput = document.getElementById("order")
     let orderTypeInput = document.getElementById("order-type")
+    let tracksInput = document.getElementById("tracks")
 
     queryInput.value = ""
     orderInput.value = order
     orderTypeInput.value = orderType
+    tracksInput.value = "any"
 
     movieTypeInput.Clear()
     productionInput.Clear()
