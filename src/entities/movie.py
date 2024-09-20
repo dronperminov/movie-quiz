@@ -133,6 +133,9 @@ class Movie:
         if self.cites:
             question_types.append(QuestionType.MOVIE_BY_CITE)
 
+        if self.tracks:
+            question_types.append(QuestionType.MOVIE_BY_TRACK)
+
         return question_types
 
     def get_question_title(self, end: str = "") -> str:

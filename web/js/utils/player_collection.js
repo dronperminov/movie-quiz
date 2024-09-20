@@ -28,3 +28,8 @@ PlayerCollection.prototype.Clear = function() {
 
     this.players = []
 }
+
+PlayerCollection.prototype.Reset = function() {
+    for (let player of this.players)
+        player.Reset()
+}

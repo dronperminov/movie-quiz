@@ -10,6 +10,7 @@ from src.entities.person import Person
 from src.entities.question_answer import QuestionAnswer
 from src.entities.question_settings import QuestionSettings
 from src.entities.spoiler_text import SpoilerText
+from src.entities.track import Track
 from src.enums import QuestionType
 
 
@@ -59,6 +60,8 @@ class Question:
             question = MovieByCharactersQuestion(title=data["title"], answer=data["answer"], characters=data["characters"])
         elif question_type == QuestionType.MOVIE_BY_CITE:
             question = MovieByCiteQuestion(title=data["title"], answer=data["answer"], cite=SpoilerText.from_dict(data["cite"]))
+        elif question_type == QuestionType.MOVIE_BY_TRACK:
+            question = MovieByTrackQuestion(title=data["title"], answer=data["answer"], track=Track.from_dict(data["track"]), question_seek=data["question_seek"])
         else:
             raise ValueError(f'Invalid question_type "{question_type}"')
 
@@ -232,3 +235,35 @@ class MovieByCiteQuestion(Question):
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), "cite": self.cite.to_dict()}
+
+
+@dataclass
+class MovieByTrackQuestion(Question):
+    track: Track
+    question_seek: float
+
+    @classmethod
+    def generate(cls: Self, movie: Movie, username: str, track: Track) -> Self:
+        question = cls(title=movie.get_question_title(" по треку"), answer=movie.get_question_answer(), track=track, question_seek=cls.get_random_seek(track))
+        question.init_base(question_type=QuestionType.MOVIE_BY_TRACK, username=username, movie_id=movie.movie_id)
+        return question
+
+    def update(self, movie: Movie, person_id2person: Dict[int, Person], settings: QuestionSettings) -> Self:
+        super().update(movie, person_id2person, settings)
+        self.title = movie.get_question_title(" по треку")
+        self.answer = movie.get_question_answer()
+        return self
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "track": self.track.to_dict(), "question_seek": self.question_seek}
+
+    @staticmethod
+    def get_random_seek(track: Track) -> float:
+        if track.lyrics and track.lyrics.lrc:
+            line = random.choice(track.lyrics.lines[:len(track.lyrics) * 3 // 4])
+            return line.time
+
+        if track.duration > 0:
+            return round(random.random() * track.duration * 0.75, 2)
+
+        return 0

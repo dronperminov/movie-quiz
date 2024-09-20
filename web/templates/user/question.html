@@ -2,7 +2,10 @@
 {% include "components/header.html" %}
     <link rel="stylesheet" type="text/css" href="/styles/utils/history.css?v={{version}}">
     <link rel="stylesheet" type="text/css" href="/styles/utils/info_panels.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/utils/player.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/utils/lyrics_updater.css?v={{version}}">
     <link rel="stylesheet" type="text/css" href="/styles/movies/movies.css?v={{version}}">
+    <link rel="stylesheet" type="text/css" href="/styles/tracks/track.css?v={{version}}">
     <link rel="stylesheet" type="text/css" href="/styles/user/question.css?v={{version}}">
 </head>
 <body ondragstart="return false">
@@ -18,19 +21,26 @@
     <script src="/js/utils/info_panels.js?v={{version}}"></script>
     <script src="/js/utils/parse.js?v={{version}}"></script>
     <script src="/js/utils/history.js?v={{version}}"></script>
-    
+    <script src="/js/utils/player.js?v={{version}}"></script>
+    <script src="/js/utils/lyrics_updater.js?v={{version}}"></script>
+    <script src="/js/utils/player_collection.js?v={{version}}"></script>
+
     <script src="/js/entities/movie_type.js?v={{version}}"></script>
     <script src="/js/entities/genre.js?v={{version}}"></script>
     <script src="/js/entities/production.js?v={{version}}"></script>
     <script src="/js/entities/metadata.js?v={{version}}"></script>
+    <script src="/js/entities/track.js?v={{version}}"></script>
     <script src="/js/entities/movie.js?v={{version}}"></script>
     <script src="/js/entities/question.js?v={{version}}"></script>
 
     <script src="/js/inputs/multi_select.js?v={{version}}"></script>
 
+    <script src="/js/icons.js?v={{version}}"></script>
+    <script src="/js/tracks/track.js?v={{version}}"></script>
     <script src="/js/user/question.js?v={{version}}"></script>
     <script>
         let infos = new InfoPanels()
+        let players = new PlayerCollection({withIcons: false})
 
         {% if question_id %}
         let questionId = {{question_id}}

@@ -21,6 +21,11 @@ Question.prototype.Build = function(question, movie, params) {
     this.BuildAnswerBlock()
 
     this.answerTime = performance.now()
+
+    if (this.questionType == "movie_by_track") {
+        this.answerTime = null
+        PlayTrack(this.question.track.track_id)
+    }
 }
 
 Question.prototype.BuildMechanic = function() {
@@ -92,17 +97,33 @@ Question.prototype.BuildSpecific = function() {
     else if (this.questionType == "movie_by_cite") {
         MakeElement("question-text", this.block, {innerHTML: this.movie.GetSpoileredText(this.question.cite)})
     }
+    else if (this.questionType == "movie_by_track") {
+        let block = MakeElement("question-track", this.block)
+        let track = new Track(this.question.track)
+        block.appendChild(track.Build({asUnknown: true, asQuestion: true}))
+
+        track.audio.setAttribute("data-seek", this.question.question_seek)
+        track.audio.addEventListener("play", () => {
+            if (this.answerTime === null) {
+                this.answerTime = performance.now()
+                this.showAnswerButton.classList.remove("hidden")
+            }
+        })
+    }
 
     for (let spoiler of document.getElementsByClassName("spoiler"))
         spoiler.classList.add("spoiler-hidden")
 }
 
 Question.prototype.BuildShowAnswerButton = function() {
-    let button = MakeElement("basic-button gradient-button", this.block, {id: "show-answer", innerText: "Показать ответ"}, "button")
-    button.addEventListener("click", () => {
+    this.showAnswerButton = MakeElement("basic-button gradient-button", this.block, {innerText: "Показать ответ"}, "button")
+    this.showAnswerButton.addEventListener("click", () => {
         this.answerTime = (performance.now() - this.answerTime) / 1000
         this.ShowAnswer()
     })
+
+    if (this.questionType === "movie_by_track")
+        this.showAnswerButton.classList.add("hidden")
 }
 
 Question.prototype.BuildAnswerBlock = function() {
@@ -127,8 +148,7 @@ Question.prototype.ShowAnswer = function(correct = null) {
     answerTimeSpan.innerText = FormatTime(this.answerTime)
     answerTimeSpan.parentNode.classList.remove("hidden")
 
-    let showAnswerButton = document.getElementById("show-answer")
-    showAnswerButton.classList.add("hidden")
+    this.showAnswerButton.classList.add("hidden")
 
     let answerBlock = document.getElementById("answer")
     answerBlock.classList.remove("hidden")
@@ -139,6 +159,8 @@ Question.prototype.ShowAnswer = function(correct = null) {
     for (let miraclesField of document.getElementsByClassName("miracles-field"))
         for (let div of miraclesField.getElementsByTagName("span"))
             div.classList.remove("hidden")
+
+    players.Reset()
 
     this.UpdateAnswerButtons(correct)
 }

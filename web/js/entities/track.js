@@ -10,11 +10,20 @@ function Track(data) {
     this.downloaded = data.downloaded
 }
 
-Track.prototype.Build = function() {
+Track.prototype.Build = function(config = null) {
     let track = MakeElement("track", null, {id: `track-${this.trackId}`})
 
+    if (config === null)
+        config = {asUnknown: false, asQuestion: false}
+
+    if (config.asQuestion)
+        track.classList.add("track-question")
+
+    if (config.asUnknown)
+        track.classList.add("track-unknown")
+
     this.BuildAudio(track)
-    this.BuildMain(track)
+    this.BuildMain(track, config.asUnknown)
 
     MakeElement("player", track, {id: `player-${this.trackId}`})
     this.BuildLyrics(track)
@@ -23,28 +32,28 @@ Track.prototype.Build = function() {
 }
 
 Track.prototype.BuildAudio = function(parent) {
-    let audio = MakeElement("", parent, {}, "audio")
+    this.audio = MakeElement("", parent, {}, "audio")
 
-    audio.setAttribute("id", `audio-${this.trackId}`)
-    audio.setAttribute("data-track-id", this.trackId)
-    audio.setAttribute("preload", "metadata")
+    this.audio.setAttribute("id", `audio-${this.trackId}`)
+    this.audio.setAttribute("data-track-id", this.trackId)
+    this.audio.setAttribute("preload", "metadata")
 
     if (this.downloaded)
-        audio.setAttribute("data-src", `https://music.dronperminov.ru/movie_tracks/${this.trackId}.mp3`)
+        this.audio.setAttribute("data-src", `https://music.dronperminov.ru/movie_tracks/${this.trackId}.mp3`)
     else
-        audio.setAttribute("data-yandex-id", this.source.yandex_id)
+        this.audio.setAttribute("data-yandex-id", this.source.yandex_id)
 }
 
-Track.prototype.BuildMain = function(parent) {
+Track.prototype.BuildMain = function(parent, asUnknown) {
     let trackMain = MakeElement("track-main", parent)
 
     let trackImage = MakeElement("track-image", trackMain)
-    let image = MakeElement("", trackImage, {id: "track-image", src: this.imageUrl}, "img")
+    let image = MakeElement("", trackImage, {id: "track-image", src: asUnknown ? "/images/tracks/default.png" : this.imageUrl}, "img")
     image.addEventListener("click", () => PlayPauseTrack(this.trackId))
 
     let div = MakeElement("", trackMain)
-    MakeElement("track-title", div, {innerText: this.title})
-    MakeElement("track-artists", div, {innerText: this.artists.join(", ")})
+    MakeElement("track-title", div, {innerText: asUnknown ? "НЕИЗВЕСТЕН" : this.title})
+    MakeElement("track-artists", div, {innerText: asUnknown ? "неизвестный исполнитель" : this.artists.join(", ")})
 
     this.BuildTrackControls(trackMain)
 }

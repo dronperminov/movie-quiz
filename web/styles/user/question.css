@@ -73,6 +73,10 @@
     line-height: 1.5em
 }
 
+.question-track {
+    margin-bottom: 1em;
+}
+
 .question-image {
     text-align: center;
 }
