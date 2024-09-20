@@ -51,6 +51,9 @@ class HistoryAction:
         if name == AddTrackAction.name:
             return AddTrackAction(username=username, timestamp=timestamp, track_id=data["track_id"])
 
+        if name == EditTrackAction.name:
+            return EditTrackAction(username=username, timestamp=timestamp, track_id=data["track_id"], diff=data["diff"])
+
         if name == RemoveTrackAction.name:
             return RemoveTrackAction(username=username, timestamp=timestamp, track_id=data["track_id"])
 
@@ -138,6 +141,16 @@ class AddTrackAction(HistoryAction):
 
     def to_dict(self) -> dict:
         return {**super().to_dict(), "track_id": self.track_id}
+
+
+@dataclass
+class EditTrackAction(HistoryAction):
+    name = "edit_track"
+    track_id: int
+    diff: dict
+
+    def to_dict(self) -> dict:
+        return {**super().to_dict(), "track_id": self.track_id, "diff": self.diff}
 
 
 @dataclass

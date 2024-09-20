@@ -4,9 +4,9 @@ from unittest import TestCase
 from src.entities.actor import Actor
 from src.entities.cite import Cite
 from src.entities.history_action import \
-    AddCiteAction, AddMovieAction, AddPersonAction, \
-    EditMovieAction, EditPersonAction, HistoryAction, \
-    RemoveCiteAction, RemoveMovieAction, RemovePersonAction
+    AddCiteAction, AddMovieAction, AddPersonAction, AddTrackAction, \
+    EditMovieAction, EditPersonAction, EditTrackAction, HistoryAction, \
+    RemoveCiteAction, RemoveMovieAction, RemovePersonAction, RemoveTrackAction
 from src.entities.lyrics import Lyrics
 from src.entities.lyrics_line import LyricsLine
 from src.entities.metadata import Metadata
@@ -157,11 +157,18 @@ class TestSerialization(TestCase):
             AddMovieAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), movie_id=1),
             EditMovieAction(username="user2", timestamp=datetime(2024, 1, 1, 20, 42, 12), movie_id=1, diff={"name": "aba"}),
             RemoveMovieAction(username="user3", timestamp=datetime(2024, 1, 2, 12, 00, 19), movie_id=1),
+
             AddPersonAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), person_id=1),
             EditPersonAction(username="user2", timestamp=datetime(2024, 1, 1, 20, 42, 12), person_id=1, diff={"name": "aba"}),
             RemovePersonAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), person_id=1),
+
             AddCiteAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), cite_id=1),
-            RemoveCiteAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), cite_id=1)
+            RemoveCiteAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), cite_id=1),
+
+            AddTrackAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), track_id=1),
+            EditTrackAction(username="user2", timestamp=datetime(2024, 1, 1, 20, 42, 12), track_id=1, diff={"title": "aba"}),
+            RemoveTrackAction(username="user", timestamp=datetime(2024, 1, 1, 20, 23, 51), track_id=1),
+
         ]
 
         for history_action in history_actions:

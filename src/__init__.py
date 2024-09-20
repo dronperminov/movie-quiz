@@ -25,6 +25,6 @@ else:
     yandex_music_parser = None
 
 database = Database(mongo_url="mongodb://localhost:27017/", database_name="movie_quiz_db")
-movie_database = MovieDatabase(database=database, kinopoisk_parser=kinopoisk_parser, logger=logger)
+movie_database = MovieDatabase(database=database, kinopoisk_parser=kinopoisk_parser, yandex_music_parser=yandex_music_parser, logger=logger)
 questions_database = QuestionsDatabase(database=database, movie_database=movie_database, logger=logger)
 quiz_tours_database = QuizToursDatabase(database=database, questions_database=questions_database, logger=logger)

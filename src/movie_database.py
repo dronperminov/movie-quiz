@@ -5,11 +5,12 @@ from typing import Dict, List, Optional, Tuple
 from urllib.error import HTTPError, URLError
 
 import wget
+from pydub import AudioSegment
 
 from src import Database
 from src.entities.cite import Cite
-from src.entities.history_action import AddCiteAction, AddMovieAction, AddPersonAction, AddTrackAction, EditMovieAction, EditPersonAction, RemoveCiteAction, \
-    RemoveMovieAction, RemovePersonAction, RemoveTrackAction
+from src.entities.history_action import AddCiteAction, AddMovieAction, AddPersonAction, AddTrackAction, EditMovieAction, EditPersonAction, EditTrackAction, \
+    RemoveCiteAction, RemoveMovieAction, RemovePersonAction, RemoveTrackAction
 from src.entities.metadata import Metadata
 from src.entities.movie import Movie
 from src.entities.person import Person
@@ -21,12 +22,14 @@ from src.query_params.movie_search import MovieSearch
 from src.query_params.person_movies import PersonMovies
 from src.utils.images import resize_image
 from src.utils.kinopoisk_parser import KinopoiskParser
+from src.utils.yandex_music_parser import YandexMusicParser
 
 
 class MovieDatabase:
-    def __init__(self, database: Database, kinopoisk_parser: KinopoiskParser, logger: logging.Logger) -> None:
+    def __init__(self, database: Database, kinopoisk_parser: KinopoiskParser, yandex_music_parser: YandexMusicParser, logger: logging.Logger) -> None:
         self.database = database
         self.kinopoisk_parser = kinopoisk_parser
+        self.yandex_music_parser = yandex_music_parser
         self.logger = logger
 
     def get_movies_count(self) -> int:
@@ -138,6 +141,33 @@ class MovieDatabase:
                 self.update_person(person_id=person.person_id, diff=person.get_diff({"photo_url": f"/images/persons/{person.person_id}.webp"}), username=username)
             except ValueError:
                 self.logger.error(f'Unable to download person photo "{person.person_id}"')
+
+    def download_tracks_image(self, output_path: str, username: str) -> None:
+        os.makedirs(output_path, exist_ok=True)
+
+        for track in self.database.tracks.find({"image_url": {"$ne": None, "$not": {"$regex": "^/images/tracks/.*"}}}, {"track_id": 1, "image_url": 1}):
+            track_image_path = os.path.join(output_path, f'{track["track_id"]}.png')
+            if os.path.exists(track_image_path):
+                os.remove(track_image_path)
+
+            wget.download(track["image_url"], track_image_path)
+            diff = {"image_url": {"prev": track["image_url"], "new": f'/images/tracks/{track["track_id"]}.png'}}
+            self.update_track(track_id=track["track_id"], diff=diff, username=username)
+
+    def download_tracks(self, output_path: str, username: str) -> None:
+        os.makedirs(output_path, exist_ok=True)
+        tracks = list(self.database.tracks.find({"downloaded": False, "source.name": "yandex"}, {"track_id": 1, "title": 1, "source": 1}))
+
+        for track, info in zip(tracks, self.yandex_music_parser.get_download_info(track_ids=[track["source"]["yandex_id"] for track in tracks])):
+            if info is None:
+                logging.error(f'Unable download track "{track["title"]}" ({track["track_id"]})')
+                continue
+
+            track_path = os.path.join(output_path, f'{track["track_id"]}.mp3')
+            info.download(track_path)
+            sound = AudioSegment.from_file(track_path)
+            sound.export(track_path, format="mp3", bitrate="128k").close()
+            self.update_track(track_id=track["track_id"], diff={"downloaded": {"prev": False, "new": True}}, username=username)
 
     def add_movie(self, movie: Movie, username: str) -> None:
         action = AddMovieAction(username=username, timestamp=datetime.now(), movie_id=movie.movie_id)
@@ -291,6 +321,23 @@ class MovieDatabase:
         self.logger.info(f"Added track {track.track_id} for movie {track.movie_id} by @{username}")
 
         self.update_movie(movie_id=movie.movie_id, diff=movie.get_diff({"tracks": [track_id for track_id in movie.tracks] + [track.track_id]}), username=username)
+
+    def update_track(self, track_id: int, diff: dict, username: str) -> None:
+        if not diff:
+            return
+
+        track = self.database.tracks.find_one({"track_id": track_id}, {"title": 1})
+        assert track is not None
+
+        action = EditTrackAction(username=username, timestamp=datetime.now(), track_id=track_id, diff=diff)
+
+        new_values = {key: key_diff["new"] for key, key_diff in diff.items()}
+        new_values["metadata.updated_at"] = action.timestamp
+        new_values["metadata.updated_by"] = action.username
+
+        self.database.tracks.update_one({"track_id": track_id}, {"$set": new_values})
+        self.database.history.insert_one(action.to_dict())
+        self.logger.info(f'Updated track "{track["title"]}" ({track_id}) by @{username} (keys: {[key for key in diff]})')
 
     def remove_track(self, track_id: int, username: str) -> None:
         track = self.database.tracks.find_one({"track_id": track_id}, {"movie_id": 1})
