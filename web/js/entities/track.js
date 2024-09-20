@@ -51,6 +51,9 @@ Track.prototype.BuildMain = function(parent, asUnknown) {
     let image = MakeElement("", trackImage, {id: "track-image", src: asUnknown ? "/images/tracks/default.png" : this.imageUrl}, "img")
     image.addEventListener("click", () => PlayPauseTrack(this.trackId))
 
+    if (this.lyrics)
+        MakeElement("track-image-lyrics", trackImage, {innerText: "T"})
+
     let div = MakeElement("", trackMain)
     MakeElement("track-title", div, {innerText: asUnknown ? "НЕИЗВЕСТЕН" : this.title})
     MakeElement("track-artists", div, {innerText: asUnknown ? "неизвестный исполнитель" : this.artists.join(", ")})
