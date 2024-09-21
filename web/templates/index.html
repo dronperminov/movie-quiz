@@ -48,7 +48,7 @@
                 </div>
                 {% endif %}
                 <div class="top-players">
-                    {% for user, rating, count in (top_players[3:15] if (top_players|length) > 3 else top_players) %}
+                    {% for user, rating, count in (top_players[3:15] if (top_players|length) >= 3 else top_players) %}
                     <div class="top-player">
                         <div class="top-player-place">{{loop.index + (3 if (top_players|length) > 3 else 0)}}</div>
                         <div class="top-player-image"><a href="/analytics?username={{user.username}}"><img src="{{user.avatar_url}}"></a></div>

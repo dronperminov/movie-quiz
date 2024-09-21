@@ -30,7 +30,7 @@ function BuildTopPlayers(players, topCount = 15) {
 
     let topPlayers = MakeElement("top-players", leaderboard)
 
-    for (let i = players.length > 3 ? 3 : 0; i < players.length && i < topCount; i++) {
+    for (let i = players.length >= 3 ? 3 : 0; i < players.length && i < topCount; i++) {
         let user = players[i][0]
 
         let topPlayer = MakeElement("top-player", topPlayers)
