@@ -40,7 +40,7 @@ def main() -> None:
     parser.add_argument("--production", help="", choices=("all", "russian", "foreign"), default="all")
     parser.add_argument("--mechanics", help="", choices=("regular", "alphabet", "stairs", "letter", "n_letters", "miracles_field", "chain"), default="regular")
     parser.add_argument("--votes", help="Min border of kinopoisk votes count", type=int, default=10_000)
-    parser.add_argument("--question-types", help="", choices=("all", "images", "images-short-description"), default="all")
+    parser.add_argument("--question-types", help="", choices=("all", "images", "tracks", "images-short-description"), default="all")
 
     args = parser.parse_args()
     assert args.questions >= 7
@@ -79,8 +79,16 @@ def main() -> None:
     }[args.mechanics]
 
     question_types = {
-        "all": {QuestionType.MOVIE_BY_IMAGE: 2, QuestionType.MOVIE_BY_SHORT_DESCRIPTION: 1, QuestionType.MOVIE_BY_ACTORS: 0.1, QuestionType.MOVIE_BY_CHARACTERS: 0.2},
+        "all": {
+            QuestionType.MOVIE_BY_IMAGE: 2,
+            QuestionType.MOVIE_BY_SHORT_DESCRIPTION: 1,
+            QuestionType.MOVIE_BY_ACTORS: 0.1,
+            QuestionType.MOVIE_BY_CHARACTERS: 0.2,
+            QuestionType.MOVIE_BY_CITE: 0.1,
+            QuestionType.MOVIE_BY_TRACK: 0.5
+        },
         "images": {QuestionType.MOVIE_BY_IMAGE: 1},
+        "tracks": {QuestionType.MOVIE_BY_TRACK: 1},
         "images-short-description": {QuestionType.MOVIE_BY_IMAGE: 2, QuestionType.MOVIE_BY_SHORT_DESCRIPTION: 1}
     }[args.question_types]
 
