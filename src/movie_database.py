@@ -306,10 +306,19 @@ class MovieDatabase:
         cite = self.database.cites.find_one({"cite_id": cite_id}, {"movie_id": 1})
         assert cite is not None
 
+        movie = self.get_movie(movie_id=cite["movie_id"])
+        if movie:
+            diff = movie.get_diff({"cites": [movie_cite_id for movie_cite_id in movie.cites if movie_cite_id != cite_id]})
+            self.update_movie(movie_id=movie.movie_id, diff=diff, username=username)
+
         action = RemoveCiteAction(username=username, timestamp=datetime.now(), cite_id=cite_id)
         self.database.cites.delete_one({"cite_id": cite_id})
         self.database.history.insert_one(action.to_dict())
         self.logger.info(f'Removed cite {cite_id} from movie {cite["movie_id"]}) by @{username}')
+
+    def get_track(self, track_id: int) -> Optional[Person]:
+        track = self.database.tracks.find_one({"track_id": track_id})
+        return Track.from_dict(track) if track else None
 
     def add_track(self, track: Track, username: str) -> None:
         movie = self.get_movie(movie_id=track.movie_id)
@@ -342,6 +351,11 @@ class MovieDatabase:
     def remove_track(self, track_id: int, username: str) -> None:
         track = self.database.tracks.find_one({"track_id": track_id}, {"movie_id": 1})
         assert track is not None
+
+        movie = self.get_movie(movie_id=track["movie_id"])
+        if movie:
+            diff = movie.get_diff({"tracks": [movie_track_id for movie_track_id in movie.tracks if movie_track_id != track_id]})
+            self.update_movie(movie_id=movie.movie_id, diff=diff, username=username)
 
         action = RemoveTrackAction(username=username, timestamp=datetime.now(), track_id=track_id)
         self.database.tracks.delete_one({"track_id": track_id})

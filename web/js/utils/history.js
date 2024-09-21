@@ -36,7 +36,10 @@ function GetActionDiff(action, key, diff) {
         "alternative_names": "альтернативные названия",
         "sequels": "сиквелы/приквелы",
 
-        "photo_url": "фото"
+        "photo_url": "фото",
+
+        "downloaded": "скачан",
+        "image_url": "изображение"
     }
 
     let prevValue = `<span class="error-color"><s>${GetActionDiffKeyValue(key, diff.prev)}</s></span>`
@@ -62,6 +65,14 @@ function BuildHistory(parent, history) {
         "edit_person": "<b>Обновлена</b> персона",
         "add_person": '<b class="success-color">Добавлена</b> персона',
         "remove_person": '<b class="error-color">Удалена</b> персона',
+
+        "edit_cite": "<b>Обновлена</b> цитата",
+        "add_cite": '<b class="success-color">Добавлена</b> цитата',
+        "remove_cite": '<b class="error-color">Удалена</b> цитата',
+
+        "edit_track": "<b>Обновлён</b> трек",
+        "add_track": '<b class="success-color">Добавлен</b> трек',
+        "remove_track": '<b class="error-color">Удалён</b> трек'
     }
 
     for (let action of history) {
@@ -81,10 +92,14 @@ function BuildHistory(parent, history) {
             objectId = ` <a class="link" href="/persons/${action.person_id}">${action.person_id}</a>`
         else if (action.name == "remove_person")
             objectId = ` ${action.person_id}`
+        else if (action.name == "add_cite" || action.name == "edit_cite" || action.name == "remove_cite")
+            objectId = ` ${action.cite_id}`
+        else if (action.name == "add_track" || action.name == "edit_track" || action.name == "remove_track")
+            objectId = ` ${action.track_id}`
 
         MakeElement("action-header", actionBlock, {innerHTML: `${action2title[action.name]}${objectId} @${action.username} ${date} в ${time}`})
 
-        if (action.name == "edit_movie" || action.name == "edit_person") {
+        if (action.name.startsWith("edit_")) {
             BuildEditAction(action, actionBlock)
         }
     }

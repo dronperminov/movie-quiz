@@ -176,6 +176,7 @@ Movie.prototype.BuildTracks = function(parent) {
     for (let track of this.params.tracks) {
         track = new Track(track)
         tracks.appendChild(track.Build())
+        infos.Add(track.BuildInfo())
     }
 }
 

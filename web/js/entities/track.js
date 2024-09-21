@@ -31,6 +31,28 @@ Track.prototype.Build = function(config = null) {
     return track
 }
 
+Track.prototype.BuildInfo = function() {
+    let info = MakeElement("info")
+    info.setAttribute("id", `info-track-${this.trackId}`)
+
+    let closeIcon = MakeElement("close-icon", info, {title: "Закрыть"})
+
+    let infoImage = MakeElement("info-image", info)
+    let img = MakeElement("", infoImage, {src: this.imageUrl, loading: "lazy"}, "img")
+
+    this.BuildName(info)
+
+    MakeElement("info-line", info, {innerHTML: `<b>Исполнител${this.artists.length == 1 ? "ь" : "и"}</b>: ${this.artists.join(", ")}`})
+
+    if (this.duration > 0)
+        MakeElement("info-line", info, {innerHTML: `<b>Длительность:</b> ${this.FormatDuration()}`})
+
+    this.metadata.BuildInfo(info)
+    this.BuildAdmin(info)
+
+    return info
+}
+
 Track.prototype.BuildAudio = function(parent) {
     this.audio = MakeElement("", parent, {}, "audio")
 
@@ -59,6 +81,7 @@ Track.prototype.BuildMain = function(parent, asUnknown) {
     MakeElement("track-artists", div, {innerText: asUnknown ? "неизвестный исполнитель" : this.artists.join(", ")})
 
     this.BuildTrackControls(trackMain)
+    this.BuildMenu(trackMain)
 }
 
 Track.prototype.BuildTrackControls = function(parent) {
@@ -74,6 +97,16 @@ Track.prototype.BuildTrackControls = function(parent) {
     loadIcon.addEventListener("click", () => PlayTrack(this.trackId))
 }
 
+Track.prototype.BuildMenu = function(parent) {
+    let trackMenu = MakeElement("track-menu", parent)
+    let ham = MakeElement("vertical-ham", trackMenu, {id: "track-menu"})
+    ham.addEventListener("click", () => infos.Show(`track-${this.trackId}`))
+
+    MakeElement("", ham)
+    MakeElement("", ham)
+    MakeElement("", ham)
+}
+
 Track.prototype.BuildLyrics = function(parent) {
     if (this.lyrics === null)
         return
@@ -84,4 +117,53 @@ Track.prototype.BuildLyrics = function(parent) {
 
     for (let line of this.lyrics.lines)
         MakeElement("lyrics-line", lines, {innerText: line.text, "data-time": line.time})
+}
+
+Track.prototype.BuildName = function(parent) {
+    let header = MakeElement("info-header-line", parent)
+
+    if (this.source.name == "yandex") {
+        let link = MakeElement("", header, {href: `https://music.yandex.ru/track/${this.source.yandex_id}`, target: "_blank"}, "a")
+        MakeElement("", link, {src: "/images/ya_music.svg"}, "img")
+    }
+
+    MakeElement("", header, {innerText: this.title}, "span")
+}
+
+Track.prototype.BuildAdmin = function(block) {
+    let adminBlock = MakeElement("admin-buttons admin-block", block)
+
+    let historyButton = MakeElement("basic-button gradient-button", adminBlock, {innerText: "История изменений"}, "button")
+    historyButton.addEventListener("click", () => ShowHistory(`/track-history/${this.trackId}`))
+
+    let removeButton = MakeElement("basic-button red-button", adminBlock, {innerText: "Удалить трек"}, "button")
+    removeButton.addEventListener("click", () => this.Remove([removeButton]))
+}
+
+Track.prototype.FormatDuration = function() {
+    let duration = Math.round(this.duration)
+    let minutes = `${Math.floor(duration / 60)}`.padStart(2, '0')
+    let seconds = `${duration % 60}`.padStart(2, '0')
+
+    return `${minutes}:${seconds}`
+}
+
+Track.prototype.Remove = function(buttons) {
+    if (!confirm(`Вы уверены, что хотите удалить трек "${this.title}"?`))
+        return
+
+    for (let button of buttons)
+        button.setAttribute("disabled", "")
+
+    SendRequest("/remove-track", {track_id: this.trackId}).then(response => {
+        if (response.status != SUCCESS_STATUS) {
+            for (let button of buttons)
+                button.removeAttribute("disabled")
+
+            ShowNotification(`Не удалось удалить трек "${this.title}".<br><b>Причина</b>: ${response.message}`, "error-notification", 3500)
+            return
+        }
+
+        location.reload()
+    })
 }

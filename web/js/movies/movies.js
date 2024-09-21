@@ -147,6 +147,14 @@ function BuildAdminInfo() {
     let personActionsInput = MakeCheckbox(personActionsBlock, "person-actions", true)
     let personActionsLabel = MakeElement("", personActionsBlock, {innerText: "Действия с персонами", "for": "person-actions"}, "label")
 
+    let trackActionsBlock = MakeElement("info-checkbox-line", info)
+    let trackActionsInput = MakeCheckbox(trackActionsBlock, "track-actions", true)
+    let trackActionsLabel = MakeElement("", trackActionsBlock, {innerText: "Действия с треками", "for": "track-actions"}, "label")
+
+    let citeActionsBlock = MakeElement("info-checkbox-line", info)
+    let citeActionsInput = MakeCheckbox(citeActionsBlock, "cite-actions", true)
+    let citeActionsLabel = MakeElement("", citeActionsBlock, {innerText: "Действия с цитатами", "for": "cite-actions"}, "label")
+
     let limitBlock = MakeElement("info-input-line", info)
     let limitLabel = MakeElement("", limitBlock, {innerText: "Количество записей:", "for": "history-limit"}, "label")
     let limitInput = MakeElement("basic-input", limitBlock, {type: "text", value: "100", id: "history-limit"}, "input")
@@ -168,6 +176,8 @@ function BuildAdminInfo() {
     historyButton.addEventListener("click", () => {
         let movieActions = movieActionsInput.checked ? ["add_movie", "edit_movie", "remove_movie"] : []
         let personActions = personActionsInput.checked ? ["add_person", "edit_person", "remove_person"] : []
+        let trackActions = trackActionsInput.checked ? ["add_track", "edit_track", "remove_track"] : []
+        let citeActions = citeActionsInput.checked ? ["add_cite", "edit_cite", "remove_cite"] : []
 
         let limitInput = new NumberInput("history-limit", 1, Infinity, /^\d+$/g)
         let limit = limitInput.GetValue()
@@ -179,7 +189,7 @@ function BuildAdminInfo() {
         if (skip === null)
             return
 
-        ShowHistory("/history", {actions: [...movieActions, ...personActions], limit: limit, skip: skip})
+        ShowHistory("/history", {actions: [...movieActions, ...personActions, ...trackActions, ...citeActions], limit: limit, skip: skip})
     })
 
     return info
