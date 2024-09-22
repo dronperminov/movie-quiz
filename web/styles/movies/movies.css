@@ -45,6 +45,7 @@
 .short-movie .movie-image, .movie .movie-image {
     cursor: pointer;
     position: relative;
+    height: fit-content;
 }
 
 .short-movie .movie-image:hover img, .movie .movie-image:hover img {
