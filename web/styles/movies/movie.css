@@ -154,6 +154,12 @@
     overflow-y: auto;
 }
 
+.movie-sequels .movie-image .movie-imdb-rating {
+    position: absolute;
+    top: unset;
+    left: unset;
+}
+
 .movie-cites {
     display: grid;
     grid-auto-flow: row;
