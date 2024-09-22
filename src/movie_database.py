@@ -378,7 +378,7 @@ class MovieDatabase:
     def add_tracks_from_yandex(self, movie_id: int, tracks: List[dict]) -> None:
         for track in tracks:
             yandex_id = track.pop("yandex_id")
-            if self.database.tracks.find_one({"source.yandex_id": yandex_id}) is not None:
+            if self.database.tracks.find_one({"source.yandex_id": yandex_id, "movie_id": movie_id}) is not None:
                 self.logger.info(f"Skip track {yandex_id}")
                 continue
 
