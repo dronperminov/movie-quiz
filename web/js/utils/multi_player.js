@@ -139,7 +139,7 @@ MultiPlayer.prototype.HandleMessage = function(message) {
 
     if (session.question === null || session.players.length < 2)
         this.ClearQuestion()
-    else if (this.question === null || this.question.movieId != session.question.movie_id || session.action == "question")
+    else if (this.question === null || this.question.movie.movieId != session.question.movie_id || session.action == "question")
         this.InitQuestion(session)
 }
 
