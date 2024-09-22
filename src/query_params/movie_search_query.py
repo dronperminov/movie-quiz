@@ -17,10 +17,11 @@ class MovieSearchQuery:
     years: Optional[str] = Query(None)
     votes: Optional[str] = Query(None)
     rating: Optional[str] = Query(None)
+    rating_imdb: Optional[str] = Query(None)
     tracks: Optional[str] = Query(None)
 
     def is_empty(self) -> bool:
-        fields = [self.query, self.order, self.order_type, self.movie_type, self.production, self.years, self.votes, self.rating, self.tracks]
+        fields = [self.query, self.order, self.order_type, self.movie_type, self.production, self.years, self.votes, self.rating, self.rating_imdb, self.tracks]
 
         for field in fields:
             if field is not None:
@@ -41,5 +42,6 @@ class MovieSearchQuery:
             years=json.loads(self.years) if self.years is not None else ["", ""],
             votes=json.loads(self.votes) if self.votes is not None else ["", ""],
             rating=json.loads(self.rating) if self.rating is not None else ["", ""],
+            rating_imdb=json.loads(self.rating_imdb) if self.rating_imdb is not None else ["", ""],
             tracks=self.tracks if self.tracks in ["any", "with", "without"] else "any"
         )

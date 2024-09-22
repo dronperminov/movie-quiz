@@ -16,6 +16,7 @@ class MovieSearch:
     years: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
     votes: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
     rating: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
+    rating_imdb: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
     tracks: str = "any"
     page: int = 0
     page_size: int = 20
@@ -29,6 +30,7 @@ class MovieSearch:
             **interval_query("year", self.years),
             **interval_query("rating.votes_kp", self.votes),
             **interval_query("rating.rating_kp", self.rating),
+            **interval_query("rating.rating_imdb", self.rating_imdb),
         }
 
         return query

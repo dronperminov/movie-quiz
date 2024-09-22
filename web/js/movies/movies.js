@@ -11,6 +11,10 @@ function GetSearchParams() {
     if (rating === null)
         return null
 
+    let ratingImdb = ratingImdbInput.GetValue()
+    if (ratingInput === null)
+        return null
+
     return {
         query: document.getElementById("query").value.trim(),
         order: document.getElementById("order").value,
@@ -20,6 +24,7 @@ function GetSearchParams() {
         years: years,
         votes: votes,
         rating: rating,
+        rating_imdb: ratingImdb,
         tracks: document.getElementById("tracks").value
     }
 }
@@ -62,7 +67,7 @@ function PushUrlParams(params = null) {
             if (params[key][0] !== "" || params[key][1] !== "")
                 url.searchParams.set(key, JSON.stringify(params[key]))
 
-        for (let key of ["movie_type", "production", "votes", "rating"])
+        for (let key of ["movie_type", "production", "votes", "rating", "rating_imdb"])
             if (Object.keys(params[key]).length > 0)
                 url.searchParams.set(key, JSON.stringify(params[key]))
     }
@@ -109,6 +114,7 @@ function SearchShortMovies(order, orderType) {
     yearsInput.Clear()
     votesInput.Clear()
     ratingInput.Clear()
+    ratingImdbInput.Clear()
 
     SearchMovies()
 }

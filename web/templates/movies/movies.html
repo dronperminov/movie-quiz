@@ -45,6 +45,7 @@
                         <select class="basic-select" id="order">
                             <option value="rating.votes_kp">оценки</option>
                             <option value="rating.rating_kp">рейтинг КП</option>
+                            <option value="rating.rating_imdb">рейтинг IMDB</option>
                             <option value="name_lowercase">название</option>
                             <option value="year">год выхода</option>
                             <option value="metadata.created_at">время создания</option>
@@ -125,6 +126,21 @@
                         </div>
                     </div>
                     <div class="error" id="rating-filter-error"></div>
+                </div>
+
+                <div class="search-filter-line"></div>
+
+                <div class="search-filter">
+                    <label onclick="ratingImdbInput.Clear()">Ретинг IMDB</label>
+                    <div class="interval-input" id="rating-imdb-filter">
+                        <div class="interval-input-cell">
+                            <span class="interval-input-label">от</span> <input class="basic-input" type="text" data-min="0" data-max="10">
+                        </div>
+                        <div class="interval-input-cell">
+                            <span class="interval-input-label">до</span> <input class="basic-input" type="text" data-min="0" data-max="10">
+                        </div>
+                    </div>
+                    <div class="error" id="rating-imdb-filter-error"></div>
                 </div>
 
                 <div class="search-filter-line"></div>
@@ -224,6 +240,7 @@
         let productionInput = new MultiSelect("production-filter"{% if search_params %}, {{search_params.production|tojson}}{% endif %})
         let votesInput = new IntervalInput("votes-filter", true{% if search_params %}, {{search_params.votes|tojson}}{% endif %})
         let ratingInput = new IntervalInput("rating-filter", false{% if search_params %}, {{search_params.rating|tojson}}{% endif %})
+        let ratingImdbInput = new IntervalInput("rating-imdb-filter", false{% if search_params %}, {{search_params.rating_imdb|tojson}}{% endif %})
 
         let infos = new InfoPanels()
         let search = new Search("search", () => SearchMovies(), () => ClearMovies())
