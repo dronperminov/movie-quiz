@@ -8,8 +8,11 @@
 
 .short-movie {
     width: 100px;
-    font-size: 0.5em;
     text-align: center;
+}
+
+.short-movie .movie-name {
+    font-size: 0.5em;
 }
 
 .short-movie-header {
@@ -57,7 +60,7 @@
     aspect-ratio: 1 / 1.5;
 }
 
-.movie .movie-image .movie-rating {
+.short-movie .movie-image .movie-rating, .movie .movie-image .movie-rating {
     position: absolute;
     left: 5px;
     top: 5px;

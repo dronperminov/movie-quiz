@@ -1,6 +1,17 @@
+{% if movie.rating.rating_kp > 7 %}
+{% set rating_color = "#3bb33b" %}
+{% elif movie.rating.rating_kp > 6 %}
+{% set rating_color = "#ff9800" %}
+{% elif movie.rating.rating_kp > 3.5 %}
+{% set rating_color = "#f44336" %}
+{% else %}
+{% set rating_color = "#545454" %}
+{% endif %}
 <div class="short-movie">
     <div class="movie-image">
         <a href="/movies/{{movie.movie_id}}"><img src="{{movie.poster_url}}" loading="lazy"></a>
+
+        <div class="movie-rating" style="background-color: {{rating_color}}">{{movie.rating.rating_kp|round(1)}}</div>
     </div>
     <div class="movie-name"><a href="/movies/{{movie.movie_id}}">{{movie.name}}</a></div>
 </div>
