@@ -66,14 +66,32 @@
     top: 5px;
 }
 
-.movie-rating {
+.short-movie .movie-image .movie-imdb-rating, .movie .movie-image .movie-imdb-rating {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+}
+
+.movie-rating, .movie-imdb-rating {
     padding: 2px 4px;
     border-radius: 3px;
     font-weight: bold;
     font-family: Montserrat;
-    font-size: 0.7em;
-    color: #fff;
+    font-size: 0.65em;
     display: inline-block;
+}
+
+.movie-rating {
+    color: #fff;
+}
+
+.movie-imdb-rating {
+    background-color: #eec100;
+    color: #000000;
+}
+
+.info .movie-imdb-rating {
+    margin-left: 5px;
 }
 
 .movie .movie-data {

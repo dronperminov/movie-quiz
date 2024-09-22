@@ -14,7 +14,18 @@
     left: 0;
 }
 
+.movie-image .movie-imdb-rating {
+    position: absolute;
+    top: 0;
+    left: 32px;
+}
+
 .movie-image img ~ .movie-rating {
+    left: 0.4em;
+    top: 0.6em;
+}
+
+.movie-image img ~ .movie-imdb-rating {
     right: 0.4em;
     bottom: 0.6em;
     left: unset;
@@ -22,13 +33,11 @@
 }
 
 .movie-rating {
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-weight: bold;
-    font-family: Montserrat;
     font-size: 0.85em;
-    color: #fff;
-    display: inline-block;
+}
+
+.movie-imdb-rating {
+    font-size: 0.85em;
 }
 
 .movie-name {

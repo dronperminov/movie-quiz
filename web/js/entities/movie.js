@@ -191,7 +191,7 @@ Movie.prototype.BuildInfo = function() {
 
     this.BuildName(info, "info-header-line")
 
-    let rating = MakeElement("info-line", info, {innerHTML: `<b>Рейтинг КП</b>: `})
+    let rating = MakeElement("info-line", info, {innerHTML: `<b>Рейтинг</b> (КП, IMDB): `})
     MakeElement("info-line", info, {innerHTML: `<b>Тип КМС</b>: ${this.movieType.ToRus()}`})
     MakeElement("info-line", info, {innerHTML: `<b>Год выхода</b>: ${this.year}`})
     this.BuildRating(rating)
@@ -323,8 +323,10 @@ Movie.prototype.BuildAdmin = function(parent) {
 Movie.prototype.BuildRating = function(parent) {
     let color = this.GetRatingColor(this.rating.rating_kp)
     let rating = Math.round(this.rating.rating_kp * 10)
+    let imdb = Math.round(this.rating.rating_imdb * 10)
 
     MakeElement("movie-rating", parent, {innerText: `${Math.floor(rating / 10)}.${rating % 10}`, style: `background-color: ${color}`})
+    MakeElement("movie-imdb-rating", parent, {innerText: `${Math.floor(imdb / 10)}.${imdb % 10}`})
 }
 
 Movie.prototype.BuildQuestionStatus = function(parent) {

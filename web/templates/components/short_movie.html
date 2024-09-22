@@ -12,6 +12,7 @@
         <a href="/movies/{{movie.movie_id}}"><img src="{{movie.poster_url}}" loading="lazy"></a>
 
         <div class="movie-rating" style="background-color: {{rating_color}}">{{movie.rating.rating_kp|round(1)}}</div>
+        <div class="movie-imdb-rating">{{movie.rating.rating_imdb|round(1)}}</div>
     </div>
     <div class="movie-name"><a href="/movies/{{movie.movie_id}}">{{movie.name}}</a></div>
 </div>
