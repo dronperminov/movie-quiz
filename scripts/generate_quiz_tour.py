@@ -9,8 +9,14 @@ from src.enums import MovieType, Production, QuestionType
 from src.enums import QuizTourType
 
 
-def get_random_picture(dir_name: str) -> str:
-    image_name = random.choice(os.listdir(os.path.join("..", "web", "images", "quiz_tours", dir_name)))
+def get_picture(dir_name: str) -> str:
+    images_dir = os.path.join("..", "web", "images", "quiz_tours")
+
+    if dir_name.endswith(".jpg") and os.path.isfile(os.path.join(images_dir, dir_name)):
+        dir_name, image_name = dir_name.split("/")
+    else:
+        image_name = random.choice(os.listdir(os.path.join(images_dir, dir_name)))
+
     return f"/images/quiz_tours/{dir_name}/{image_name}"
 
 
@@ -106,7 +112,7 @@ def main() -> None:
     params = {
         "name": args.name,
         "description": args.description,
-        "image_url": get_random_picture(args.image),
+        "image_url": get_picture(args.image),
         "tags": get_tags(args)
     }
 
