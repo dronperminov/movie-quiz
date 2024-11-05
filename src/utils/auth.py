@@ -34,7 +34,7 @@ async def token_to_user(token: str = Depends(OAuth2PasswordBearer(tokenUrl="/log
 
         if datetime.fromtimestamp(payload["exp"]) < datetime.now():
             return None
-    except jwt.exceptions.DecodeError:
+    except (jwt.exceptions.DecodeError, jwt.ExpiredSignatureError):
         return None
 
     return database.get_user(username=payload["sub"])
