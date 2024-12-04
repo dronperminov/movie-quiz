@@ -9,7 +9,7 @@ from src import database, movie_database, questions_database
 from src.api import send_error, templates
 from src.entities.question_settings import QuestionSettings
 from src.entities.user import User
-from src.enums import MovieType, Production, UserRole
+from src.enums import Genre, MovieType, Production, UserRole
 from src.query_params.movie_remove import MovieRemove
 from src.query_params.movie_search import MovieSearch
 from src.query_params.movie_search_query import MovieSearchQuery
@@ -37,6 +37,7 @@ def get_movies(user: Optional[User] = Depends(get_user), params: MovieSearchQuer
         top_voted_movies=top_voted_movies,
         MovieType=MovieType,
         Production=Production,
+        Genre=Genre,
         search_params=search_params
     )
 

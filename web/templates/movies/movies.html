@@ -86,6 +86,15 @@
                 <div class="search-filter-line"></div>
 
                 <div class="search-filter">
+                    <label onclick="genreInput.Clear()">Жанр</label>
+                    <div class="multi-select" id="genre-filter">
+                        {% for genre in Genre %}<div class="multi-select-option" data-name="{{genre.value}}">{{genre.to_rus()}}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="search-filter-line"></div>
+
+                <div class="search-filter">
                     <label onclick="yearsInput.Clear()">Год выхода</label>
                     <div class="interval-input" id="years-filter">
                         <div class="interval-input-cell">
@@ -238,6 +247,7 @@
         let yearsInput = new IntervalInput("years-filter", false{% if search_params %}, {{search_params.years|tojson}}{% endif %})
         let movieTypeInput = new MultiSelect("movie-type-filter"{% if search_params %}, {{search_params.movie_type|tojson}}{% endif %})
         let productionInput = new MultiSelect("production-filter"{% if search_params %}, {{search_params.production|tojson}}{% endif %})
+        let genreInput = new MultiSelect("genre-filter"{% if search_params %}, {{search_params.genre|tojson}}{% endif %})
         let votesInput = new IntervalInput("votes-filter", true{% if search_params %}, {{search_params.votes|tojson}}{% endif %})
         let ratingInput = new IntervalInput("rating-filter", false{% if search_params %}, {{search_params.rating|tojson}}{% endif %})
         let ratingImdbInput = new IntervalInput("rating-imdb-filter", false{% if search_params %}, {{search_params.rating_imdb|tojson}}{% endif %})

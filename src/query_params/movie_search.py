@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Union
 
-from src.enums import MovieType, Production
+from src.enums import Genre, MovieType, Production
 from src.utils.queries import enum_query, interval_query
 
 
@@ -13,6 +13,7 @@ class MovieSearch:
     order_type: int = -1
     movie_type: Dict[MovieType, bool] = field(default_factory=dict)
     production: Dict[Production, bool] = field(default_factory=dict)
+    genre: Dict[Genre, bool] = field(default_factory=dict)
     years: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
     votes: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
     rating: List[Union[str, float, int]] = field(default_factory=lambda: ["", ""])
@@ -27,6 +28,7 @@ class MovieSearch:
             **self.__to_tracks_query(),
             **enum_query("movie_type", self.movie_type),
             **enum_query("production", self.production),
+            **enum_query("genres", self.genre),
             **interval_query("year", self.years),
             **interval_query("rating.votes_kp", self.votes),
             **interval_query("rating.rating_kp", self.rating),
